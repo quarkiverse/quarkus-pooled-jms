@@ -1,28 +1,23 @@
 package io.quarkiverse.messaginghub.pooled.jms.deployment;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Produces;
-import javax.transaction.TransactionManager;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.jboss.tm.XAResourceRecoveryRegistry;
 
-import org.jboss.jandex.DotName;
-import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
-import org.messaginghub.pooled.jms.JmsPoolXAConnectionFactory;
-
-import io.quarkiverse.messaginghub.pooled.jms.PooledJmsRuntimeConfig;
-import io.quarkus.arc.deployment.GeneratedBeanBuildItem;
-import io.quarkus.arc.deployment.GeneratedBeanGizmoAdaptor;
+import io.quarkiverse.messaginghub.pooled.jms.PooledJmsRecorder;
+import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
+import io.quarkus.artemis.jms.deployment.ArtemisJmsWrapperBuildItem;
+import io.quarkus.deployment.Capabilities;
+import io.quarkus.deployment.Capability;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.annotations.ExecutionTime;
+import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
-import io.quarkus.gizmo.ClassCreator;
-import io.quarkus.gizmo.MethodCreator;
-import io.quarkus.gizmo.MethodDescriptor;
-import io.quarkus.gizmo.ResultHandle;
+import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 
 class PooledJmsProcessor {
 
     private static final String FEATURE = "pooled-jms";
-    private static final DotName JMS_POOL_CONNECTION_FACTORY = DotName.createSimple(JmsPoolConnectionFactory.class.getName());
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -30,26 +25,19 @@ class PooledJmsProcessor {
     }
 
     @BuildStep
-    void generatePooledConnectionFactory(PooledJmsRuntimeConfig config,
-            BuildProducer<GeneratedBeanBuildItem> generatedBeanBuildItemBuildProducer) {
-        try (ClassCreator c = ClassCreator.builder()
-                .classOutput(new GeneratedBeanGizmoAdaptor(generatedBeanBuildItemBuildProducer)).className(
-                        JmsPoolConnectionFactory.class.getName() + "Generated")
-                .build()) {
-            c.addAnnotation(Dependent.class);
-            MethodCreator jmsPoolConnectionFactory = c.getMethodCreator("jmsPoolConnectionFactory",
-                    JmsPoolConnectionFactory.class, TransactionManager.class);
-            jmsPoolConnectionFactory.addAnnotation(Produces.class);
-            ResultHandle transactionManagerParam = jmsPoolConnectionFactory.getMethodParam(0);
-            ResultHandle result = jmsPoolConnectionFactory
-                    .newInstance(MethodDescriptor.ofConstructor(JmsPoolXAConnectionFactory.class));
-            jmsPoolConnectionFactory.invokeVirtualMethod(
-                    MethodDescriptor.ofMethod(JmsPoolXAConnectionFactory.class, "setTransactionManager", void.class,
-                            TransactionManager.class),
-                    result,
-                    transactionManagerParam);
-            jmsPoolConnectionFactory.returnValue(result);
-        }
+    void reflective(BuildProducer<ReflectiveClassBuildItem> producer) {
+        producer.produce(new ReflectiveClassBuildItem(true, false, ActiveMQConnectionFactory.class));
+        producer.produce(new ReflectiveClassBuildItem(true, false, "org.apache.commons.pool2.impl.DefaultEvictionPolicy"));
+    }
 
+    @BuildStep
+    @Record(ExecutionTime.RUNTIME_INIT)
+    ArtemisJmsWrapperBuildItem wrap(Capabilities capabilities, PooledJmsRecorder recorder) {
+        return new ArtemisJmsWrapperBuildItem(recorder.getWrapper(capabilities.isPresent(Capability.TRANSACTIONS)));
+    }
+
+    @BuildStep
+    void unremovableBean(BuildProducer<UnremovableBeanBuildItem> unremovableBeans) {
+        unremovableBeans.produce(UnremovableBeanBuildItem.beanTypes(XAResourceRecoveryRegistry.class));
     }
 }

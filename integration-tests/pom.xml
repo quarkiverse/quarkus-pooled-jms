@@ -15,6 +15,15 @@
       <artifactId>quarkus-resteasy</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-narayana-jta</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkiverse.artemis</groupId>
+      <artifactId>quarkus-artemis-jms</artifactId>
+      <version>${quarkus-artemis.version}</version>
+    </dependency>
+    <dependency>
       <groupId>io.quarkiverse.messaginghub</groupId>
       <artifactId>quarkus-pooled-jms</artifactId>
       <version>${project.version}</version>
@@ -22,6 +31,12 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkiverse.artemis</groupId>
+      <artifactId>quarkus-test-artemis</artifactId>
+      <version>${quarkus-artemis.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

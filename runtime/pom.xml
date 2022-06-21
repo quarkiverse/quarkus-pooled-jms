@@ -15,13 +15,15 @@
       <artifactId>quarkus-arc</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.quarkiverse.artemis</groupId>
-      <artifactId>quarkus-artemis-jms</artifactId>
-      <version>1.0.6</version>
-    </dependency>
-    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-narayana-jta</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkiverse.artemis</groupId>
+      <artifactId>quarkus-artemis-jms</artifactId>
+      <version>${quarkus-artemis.version}</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.messaginghub</groupId>
