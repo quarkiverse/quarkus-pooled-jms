@@ -1,9 +1,11 @@
-name: Pooled Jms
-#description: Pooled Jms ...
+name: Messaginghub Pooled JMS
+description: Quarkus extension for a JMS Connection pool and transaction manager integration for messaging applications supporting JMS 1.1 and 2.0 clients
 metadata:
-#  keywords:
-#    - pooled-jms
-#  guide: ...
-#  categories:
-#    - "miscellaneous"
-#  status: "preview"
+  keywords:
+    - messaging
+    - jms
+    - pooling
+  guide: "https://quarkiverse.github.io/quarkiverse-docs/quarkus-pooled-jms/dev/index.html"
+  categories:
+    - "miscellaneous"
+  status: "preview"

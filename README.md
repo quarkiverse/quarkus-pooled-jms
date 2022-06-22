@@ -1,23 +1,25 @@
-# Quarkus - Pooled Jms
+# Quarkus Messaginghub Pooled JMS Extension
+[![Build](https://github.com/quarkiverse/quarkus-pooled-jms/workflows/Build/badge.svg?branch=master)](https://github.com/quarkiverse/quarkus-pooled-jms/actions?query=workflow%3ABuild)
+[![License](https://img.shields.io/github/license/quarkiverse/quarkus-pooled-jms)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Central](https://img.shields.io/maven-central/v/io.quarkiverse.messaginghub/quarkus-pooled-jms-parent?color=green)](https://search.maven.org/search?q=g:io.quarkiverse.messaginghub%20AND%20a:quarkus-pooled-jms-parent)
+<!-- ALL-CONTRIBUTORS-BADGE:START -->
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-## Welcome to Quarkiverse!
+This extension provides JMS Connection pool for messaging applications that provides pooling for JMS Connections, Sessions and MessageProducers. Also it can be integrated with transaction manager to support XA JTA which is provided by [Quarkus Narayana JTA](https://quarkus.io/guides/transaction). Add the following dependency in your pom.xml to get started,
 
-Congratulations and thank you for creating a new Quarkus extension project in Quarkiverse!
+```xml
+<dependency>
+    <groupId>io.quarkiverse.messaginghub</groupId>
+    <artifactId>quarkus-pooled-jms</artifactId>
+</dependency>
+```
 
-Feel free to replace this content with the proper description of your new project and necessary instructions how to use and contribute to it.
+For more information and quickstart, you can check the complete [documentation](https://quarkiverse.github.io/quarkiverse-docs/quarkus-pooled-jms/dev/index.html).
 
-You can find the basic info, Quarkiverse policies and conventions in [the Quarkiverse wiki](https://github.com/quarkiverse/quarkiverse/wiki).
+## Contributors ✨
 
-In case you are creating a Quarkus extension project for the first time, please follow [Building My First Extension](https://quarkus.io/guides/building-my-first-extension) guide.
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+<!-- ALL-CONTRIBUTORS-LIST:START -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
-Other useful articles related to Quarkus extension development can be found under the [Writing Extensions](https://quarkus.io/guides/#writing-extensions) guide category on the [Quarkus.io](http://quarkus.io) website.
-
-Thanks again, good luck and have fun!
-
-## Documentation
-
-The documentation for this extension should be maintained as part of this repository and it is stored in the `docs/` directory. 
-
-The layout should follow the [Antora's Standard File and Directory Set](https://docs.antora.org/antora/2.3/standard-directories/).
-
-Once the docs are ready to be published, please open a PR including this repository in the [Quarkiverse Docs Antora playbook](https://github.com/quarkiverse/quarkiverse-docs/blob/main/antora-playbook.yml#L7). See an example [here](https://github.com/quarkiverse/quarkiverse-docs/pull/1).
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

@@ -1,7 +1,7 @@
 = Quarkus - Pooled Jms
 :extension-status: preview
 
-Describe what the extension does here.
+Quarkus extension for a JMS Connection pool and transaction manager integration for messaging applications supporting JMS 1.1 and 2.0 clients.
 
 == Installation
 
