@@ -1,5 +1,5 @@
 # Quarkus Messaginghub Pooled JMS Extension
-[![Build](https://github.com/quarkiverse/quarkus-pooled-jms/workflows/Build/badge.svg?branch=master)](https://github.com/quarkiverse/quarkus-pooled-jms/actions?query=workflow%3ABuild)
+[![Build](https://github.com/quarkiverse/quarkus-pooled-jms/workflows/Build/badge.svg?branch=main)](https://github.com/quarkiverse/quarkus-pooled-jms/actions?query=workflow%3ABuild)
 [![License](https://img.shields.io/github/license/quarkiverse/quarkus-pooled-jms)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Central](https://img.shields.io/maven-central/v/io.quarkiverse.messaginghub/quarkus-pooled-jms-parent?color=green)](https://search.maven.org/search?q=g:io.quarkiverse.messaginghub%20AND%20a:quarkus-pooled-jms-parent)
 <!-- ALL-CONTRIBUTORS-BADGE:START -->
