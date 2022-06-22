@@ -1,112 +1,91 @@
-//
-// This content is generated using mvn compile and copied manually to here
-//
 [.configuration-legend]
 icon:lock[title=Fixed at build time] Configuration property fixed at build time - All other configuration properties are overridable at runtime
 [.configuration-reference.searchable, cols="80,.^10,.^10"]
 |===
 
-h|[[quarkus-freemarker_configuration]]link:#quarkus-freemarker_configuration[Configuration property]
+h|[[quarkus-pooled-jms_configuration]]link:#quarkus-pooled-jms_configuration[Configuration property]
 
 h|Type
 h|Default
 
-a|icon:lock[title=Fixed at build time] [[quarkus-freemarker_quarkus.freemarker.resource-paths]]`link:#quarkus-freemarker_quarkus.freemarker.resource-paths[quarkus.freemarker.resource-paths]`
+a|icon:lock[title=Fixed at build time] [[quarkus-pooled-jms_quarkus.pooled-jms.xa]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.xa[quarkus.pooled-jms.xa]`
 
 [.description]
 --
-Comma-separated list of absolute resource paths to scan recursively for templates. All tree folder from 'resource-paths' will be added as a resource. Unprefixed locations or locations starting with classpath will be processed in the same way.
---|list of string
-|`freemarker/templates`
+enable xa.
+--|boolean 
+|`false`
 
 
-a| [[quarkus-freemarker_quarkus.freemarker.file-paths]]`link:#quarkus-freemarker_quarkus.freemarker.file-paths[quarkus.freemarker.file-paths]`
-
-[.description]
---
-Comma-separated of file system paths where freemarker templates are located
---|list of string
-|
-
-
-a| [[quarkus-freemarker_quarkus.freemarker.default-encoding]]`link:#quarkus-freemarker_quarkus.freemarker.default-encoding[quarkus.freemarker.default-encoding]`
+a|icon:lock[title=Fixed at build time] [[quarkus-pooled-jms_quarkus.pooled-jms.max-connections]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.max-connections[quarkus.pooled-jms.max-connections]`
 
 [.description]
 --
-Set the preferred charset template files are stored in.
---|string
-|
+Determines the maximum number of Connections the pool maintains in a single Connection pool (defaults to one).
+--|int 
+|`1`
 
 
-a| [[quarkus-freemarker_quarkus.freemarker.template-exception-handler]]`link:#quarkus-freemarker_quarkus.freemarker.template-exception-handler[quarkus.freemarker.template-exception-handler]`
-
-[.description]
---
-Sets how errors will appear. rethrow, debug, html-debug, ignore.
---|string
-|
-
-
-a| [[quarkus-freemarker_quarkus.freemarker.log-template-exceptions]]`link:#quarkus-freemarker_quarkus.freemarker.log-template-exceptions[quarkus.freemarker.log-template-exceptions]`
+a|icon:lock[title=Fixed at build time] [[quarkus-pooled-jms_quarkus.pooled-jms.connection-idle-timeout]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.connection-idle-timeout[quarkus.pooled-jms.connection-idle-timeout]`
 
 [.description]
 --
-If false, don't log exceptions inside FreeMarker that it will be thrown at you anyway.
---|boolean
-|
+The idle timeout (default 30 seconds) controls how long a Connection that hasn't been or currently isn't loaned out to any client will remain idle in the Connection pool before it is eligible to be closed and discarded. To disable idle timeouts the value should be set to 0 or a negative number.
+--|int 
+|`30`
 
 
-a| [[quarkus-freemarker_quarkus.freemarker.wrap-unchecked-exceptions]]`link:#quarkus-freemarker_quarkus.freemarker.wrap-unchecked-exceptions[quarkus.freemarker.wrap-unchecked-exceptions]`
-
-[.description]
---
-Wrap unchecked exceptions thrown during template processing into TemplateException-s.
---|boolean
-|
-
-
-a| [[quarkus-freemarker_quarkus.freemarker.fallback-on-null-loop-variable]]`link:#quarkus-freemarker_quarkus.freemarker.fallback-on-null-loop-variable[quarkus.freemarker.fallback-on-null-loop-variable]`
+a|icon:lock[title=Fixed at build time] [[quarkus-pooled-jms_quarkus.pooled-jms.connection-check-interval]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.connection-check-interval[quarkus.pooled-jms.connection-check-interval]`
 
 [.description]
 --
-If false, do not fall back to higher scopes when reading a null loop variable.
---|boolean
-|
+used to establish a periodic check for expired Connections which will close all Connection that have exceeded the set expiration value. This value is set to 0ms by default and only activates if set to a positive non-zero value.
+--|long 
+|`0`
 
 
-a| [[quarkus-freemarker_quarkus.freemarker.boolean-format]]`link:#quarkus-freemarker_quarkus.freemarker.boolean-format[quarkus.freemarker.boolean-format]`
-
-[.description]
---
-The string value for the boolean `true` and `false` values, usually intended for human consumption (not for a computer language), separated with comma.
---|string
-|
-
-
-a| [[quarkus-freemarker_quarkus.freemarker.number-format]]`link:#quarkus-freemarker_quarkus.freemarker.number-format[quarkus.freemarker.number-format]`
+a|icon:lock[title=Fixed at build time] [[quarkus-pooled-jms_quarkus.pooled-jms.use-provider-jms-context]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.use-provider-jms-context[quarkus.pooled-jms.use-provider-jms-context]`
 
 [.description]
 --
-Sets the default number format used to convert numbers to strings.
---|string
-|
+by default the JMS pool will use it's own generic JMSContext classes to wrap a Connection borrowed from the pool instead of using the JMSContext functionality of the JMS ConnectionFactory that was configured. This generic JMSContext implementation may be limited compared to the Provider version and if that functionality is critical to the application this option can be enabled to force the pool to use the Provider JMSContext implementation. When enabled the JMSContext API is then not part of the Connections that are pooled by this JMS Connection pooling library.
+--|boolean 
+|`false`
 
 
-a| [[quarkus-freemarker_quarkus.freemarker.object-wrapper-expose-fields]]`link:#quarkus-freemarker_quarkus.freemarker.object-wrapper-expose-fields[quarkus.freemarker.object-wrapper-expose-fields]`
-
-[.description]
---
-If true, the object wrapper will be configured to expose fields.
---|boolean
-|
-
-
-a|icon:lock[title=Fixed at build time] [[quarkus-freemarker_quarkus.freemarker.directive-directive]]`link:#quarkus-freemarker_quarkus.freemarker.directive-directive[quarkus.freemarker.directive]`
+a|icon:lock[title=Fixed at build time] [[quarkus-pooled-jms_quarkus.pooled-jms.max-sessions-per-connection]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.max-sessions-per-connection[quarkus.pooled-jms.max-sessions-per-connection]`
 
 [.description]
 --
-List of directives to register with format name=classname
---|`Map<String,String>`
-|
+For each Connection in the pool there can be a configured maximum number of Sessions that the pooled Connection will loan out before either blocking or throwing an error (based on configuration). By default this value is 500 meaning that each provider Connection is limited to 500 sessions, this limit can be disabled by setting the value to a negative number.
+--|int 
+|`500`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-pooled-jms_quarkus.pooled-jms.block-if-session-pool-is-full]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.block-if-session-pool-is-full[quarkus.pooled-jms.block-if-session-pool-is-full]`
+
+[.description]
+--
+When true (default) a call to createSession on a Connection from the pool will block until another previously created and loaned out session is closed an thereby becomes available. When false a call to createSession when no Session is available will throw an IllegalStateException to indicate that the Connection is not able to provide a new Session at that time.
+--|boolean 
+|`true`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-pooled-jms_quarkus.pooled-jms.block-if-session-pool-is-full-timeout]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.block-if-session-pool-is-full-timeout[quarkus.pooled-jms.block-if-session-pool-is-full-timeout]`
+
+[.description]
+--
+When the blockIfSessionPoolIsFull option is enabled and this value is set then a call to createSession that has blocked awaiting a Session will wait for the specified number of milliseconds before throwing an IllegalStateException. By default this value is set to -1 indicating that the createSession call should block forever if configured to wait.
+--|int 
+|`-1`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-pooled-jms_quarkus.pooled-jms.use-anonymous-producers]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.use-anonymous-producers[quarkus.pooled-jms.use-anonymous-producers]`
+
+[.description]
+--
+By default a Session that has been loaned out on a call to createSession will use a single anonymous JMS MessageProducer as the underlying producer for all calls to createProducer. In some rare cases this is not desirable and this feature can be disabled using this option, when disabled every call to createProducer will result in a new MessageProducer instance being created.
+--|boolean 
+|`true`
 
 |===
