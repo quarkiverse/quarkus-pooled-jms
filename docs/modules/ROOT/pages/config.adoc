@@ -8,11 +8,11 @@ h|[[quarkus-pooled-jms_configuration]]link:#quarkus-pooled-jms_configuration[Con
 h|Type
 h|Default
 
-a|icon:lock[title=Fixed at build time] [[quarkus-pooled-jms_quarkus.pooled-jms.xa]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.xa[quarkus.pooled-jms.xa]`
+a|icon:lock[title=Fixed at build time] [[quarkus-pooled-jms_quarkus.pooled-jms.xa.enabled]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.xa.enabled[quarkus.pooled-jms.xa.enabled]`
 
 [.description]
 --
-enable xa.
+Whether to enable `javax.jms.XAConnection` support and integrate with `javax.transaction.TransactionManager` If you enable it, you need to include `io.quarkus:quarkus-narayana-jta` extension.
 --|boolean 
 |`false`
 
