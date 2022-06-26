@@ -8,10 +8,11 @@ import io.quarkus.runtime.annotations.ConfigRoot;
 public class PooledJmsRuntimeConfig {
 
     /**
-     * enable xa.
+     * Whether to enable {@link javax.jms.XAConnection} support and integrate with {@link javax.transaction.TransactionManager}
+     * If you enable it, you need to include `io.quarkus:quarkus-narayana-jta` extension.
      */
-    @ConfigItem(defaultValue = "false")
-    public boolean xa;
+    @ConfigItem(name = "xa.enabled", defaultValue = "false")
+    public boolean xaEnabled;
 
     /**
      * Determines the maximum number of Connections the pool maintains in a single Connection pool (defaults to one).
