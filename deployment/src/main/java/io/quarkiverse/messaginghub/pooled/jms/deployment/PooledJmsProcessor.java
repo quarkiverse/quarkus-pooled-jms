@@ -17,7 +17,7 @@ import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 
 class PooledJmsProcessor {
 
-    private static final String FEATURE = "pooled-jms";
+    private static final String FEATURE = "messaginghub-pooled-jms";
 
     @BuildStep
     FeatureBuildItem feature() {

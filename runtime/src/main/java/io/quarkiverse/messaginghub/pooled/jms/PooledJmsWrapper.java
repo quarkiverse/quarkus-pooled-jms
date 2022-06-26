@@ -21,7 +21,7 @@ public class PooledJmsWrapper implements ArtemisJmsWrapper {
 
     @Override
     public ConnectionFactory wrapConnectionFactory(ActiveMQConnectionFactory connectionFactory) {
-        if (transaction && config.xa) {
+        if (transaction && config.xaEnabled) {
             return getXAConnectionFactory(connectionFactory);
         } else {
             return getConnectionFactory(connectionFactory);
