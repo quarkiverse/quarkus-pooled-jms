@@ -8,6 +8,12 @@ import io.quarkus.runtime.annotations.ConfigRoot;
 public class PooledJmsRuntimeConfig {
 
     /**
+     * Whether to enable pooling capabilities for JMS connections.
+     */
+    @ConfigItem(name = "pooling.enabled", defaultValue = "true")
+    public boolean poolingEnabled;
+
+    /**
      * Whether to enable {@link javax.jms.XAConnection} support and integrate with {@link javax.transaction.TransactionManager}
      * If you enable it, you need to include `io.quarkus:quarkus-narayana-jta` extension.
      */
