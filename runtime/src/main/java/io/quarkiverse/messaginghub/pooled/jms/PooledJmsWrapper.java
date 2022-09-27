@@ -2,30 +2,39 @@ package io.quarkiverse.messaginghub.pooled.jms;
 
 import javax.jms.ConnectionFactory;
 import javax.transaction.TransactionManager;
+import javax.transaction.xa.XAResource;
 
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.jboss.narayana.jta.jms.JmsXAResourceRecoveryHelper;
+import org.jboss.tm.XAResourceRecovery;
+import org.jboss.tm.XAResourceRecoveryRegistry;
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 import org.messaginghub.pooled.jms.JmsPoolXAConnectionFactory;
 
 import io.quarkus.arc.Arc;
 import io.quarkus.artemis.jms.runtime.ArtemisJmsWrapper;
+import io.quarkus.narayana.jta.runtime.TransactionManagerConfiguration;
 
 public class PooledJmsWrapper implements ArtemisJmsWrapper {
     private boolean transaction;
-    private PooledJmsRuntimeConfig config;
+    private PooledJmsRuntimeConfig pooledJmsRuntimeConfig;
 
-    public PooledJmsWrapper(boolean transaction, PooledJmsRuntimeConfig config) {
+    private TransactionManagerConfiguration transactionConfig;
+
+    public PooledJmsWrapper(boolean transaction, PooledJmsRuntimeConfig pooledJmsRuntimeConfig,
+            TransactionManagerConfiguration transactionConfig) {
         this.transaction = transaction;
-        this.config = config;
+        this.pooledJmsRuntimeConfig = pooledJmsRuntimeConfig;
+        this.transactionConfig = transactionConfig;
     }
 
     @Override
     public ConnectionFactory wrapConnectionFactory(ActiveMQConnectionFactory connectionFactory) {
-        if (!config.poolingEnabled) {
+        if (!pooledJmsRuntimeConfig.poolingEnabled) {
             return connectionFactory;
         }
 
-        if (transaction && config.xaEnabled) {
+        if (transaction && pooledJmsRuntimeConfig.xaEnabled) {
             return getXAConnectionFactory(connectionFactory);
         } else {
             return getConnectionFactory(connectionFactory);
@@ -37,29 +46,41 @@ public class PooledJmsWrapper implements ArtemisJmsWrapper {
 
         JmsPoolXAConnectionFactory xaConnectionFactory = new JmsPoolXAConnectionFactory();
         xaConnectionFactory.setTransactionManager(transactionManager);
-        configureConnectionFactory(xaConnectionFactory, connectionFactory);
+        pooledJmsRuntimeConfigureConnectionFactory(xaConnectionFactory, connectionFactory);
+
+        XAResourceRecoveryRegistry xaResourceRecoveryRegistry = Arc.container().instance(XAResourceRecoveryRegistry.class)
+                .get();
+        if (xaResourceRecoveryRegistry != null && transactionConfig.enableRecovery) {
+            JmsXAResourceRecoveryHelper recoveryHelper = new JmsXAResourceRecoveryHelper(xaConnectionFactory);
+            xaResourceRecoveryRegistry.addXAResourceRecovery(new XAResourceRecovery() {
+                @Override
+                public XAResource[] getXAResources() {
+                    return recoveryHelper.getXAResources();
+                }
+            });
+        }
 
         return xaConnectionFactory;
     }
 
     private ConnectionFactory getConnectionFactory(ActiveMQConnectionFactory connectionFactory) {
         JmsPoolConnectionFactory poolConnectionFactory = new JmsPoolConnectionFactory();
-        configureConnectionFactory(poolConnectionFactory, connectionFactory);
+        pooledJmsRuntimeConfigureConnectionFactory(poolConnectionFactory, connectionFactory);
 
         return poolConnectionFactory;
     }
 
-    private void configureConnectionFactory(JmsPoolConnectionFactory poolConnectionFactory,
+    private void pooledJmsRuntimeConfigureConnectionFactory(JmsPoolConnectionFactory poolConnectionFactory,
             ActiveMQConnectionFactory connectionFactory) {
         poolConnectionFactory.setConnectionFactory(connectionFactory);
-        poolConnectionFactory.setMaxConnections(config.maxConnections);
-        poolConnectionFactory.setConnectionIdleTimeout(config.connectionIdleTimeout);
-        poolConnectionFactory.setConnectionCheckInterval(config.connectionCheckInterval);
-        poolConnectionFactory.setUseProviderJMSContext(config.useProviderJMSContext);
+        poolConnectionFactory.setMaxConnections(pooledJmsRuntimeConfig.maxConnections);
+        poolConnectionFactory.setConnectionIdleTimeout(pooledJmsRuntimeConfig.connectionIdleTimeout);
+        poolConnectionFactory.setConnectionCheckInterval(pooledJmsRuntimeConfig.connectionCheckInterval);
+        poolConnectionFactory.setUseProviderJMSContext(pooledJmsRuntimeConfig.useProviderJMSContext);
 
-        poolConnectionFactory.setMaxSessionsPerConnection(config.maxSessionsPerConnection);
-        poolConnectionFactory.setBlockIfSessionPoolIsFull(config.blockIfSessionPoolIsFull);
-        poolConnectionFactory.setBlockIfSessionPoolIsFullTimeout(config.blockIfSessionPoolIsFullTimeout);
-        poolConnectionFactory.setUseAnonymousProducers(config.useAnonymousProducers);
+        poolConnectionFactory.setMaxSessionsPerConnection(pooledJmsRuntimeConfig.maxSessionsPerConnection);
+        poolConnectionFactory.setBlockIfSessionPoolIsFull(pooledJmsRuntimeConfig.blockIfSessionPoolIsFull);
+        poolConnectionFactory.setBlockIfSessionPoolIsFullTimeout(pooledJmsRuntimeConfig.blockIfSessionPoolIsFullTimeout);
+        poolConnectionFactory.setUseAnonymousProducers(pooledJmsRuntimeConfig.useAnonymousProducers);
     }
 }
