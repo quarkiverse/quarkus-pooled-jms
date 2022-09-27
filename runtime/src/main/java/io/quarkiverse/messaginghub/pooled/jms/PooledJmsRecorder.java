@@ -1,17 +1,21 @@
 package io.quarkiverse.messaginghub.pooled.jms;
 
 import io.quarkus.artemis.jms.runtime.ArtemisJmsWrapper;
+import io.quarkus.narayana.jta.runtime.TransactionManagerConfiguration;
 import io.quarkus.runtime.annotations.Recorder;
 
 @Recorder
 public class PooledJmsRecorder {
-    private PooledJmsRuntimeConfig config;
+    private PooledJmsRuntimeConfig pooledJmsRuntimeConfig;
 
-    public PooledJmsRecorder(PooledJmsRuntimeConfig config) {
-        this.config = config;
+    private TransactionManagerConfiguration transactionConfig;
+
+    public PooledJmsRecorder(PooledJmsRuntimeConfig config, TransactionManagerConfiguration transactionConfig) {
+        this.pooledJmsRuntimeConfig = config;
+        this.transactionConfig = transactionConfig;
     }
 
     public ArtemisJmsWrapper getWrapper(boolean transaction) {
-        return new PooledJmsWrapper(transaction, config);
+        return new PooledJmsWrapper(transaction, pooledJmsRuntimeConfig, transactionConfig);
     }
 }
