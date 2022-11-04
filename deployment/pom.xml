@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.quarkiverse.messaginghub</groupId>
     <artifactId>quarkus-pooled-jms-parent</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>1.0.6</version>
   </parent>
   <artifactId>quarkus-pooled-jms-deployment</artifactId>
   <name>Quarkus - Pooled Jms - Deployment</name>
