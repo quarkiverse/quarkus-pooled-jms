@@ -2,12 +2,10 @@ package io.quarkiverse.messaginghub.pooled.jms;
 
 import javax.jms.ConnectionFactory;
 import javax.transaction.TransactionManager;
-import javax.transaction.xa.XAResource;
 
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.jboss.narayana.jta.jms.JmsXAResourceRecoveryHelper;
-import org.jboss.tm.XAResourceRecovery;
 import org.jboss.tm.XAResourceRecoveryRegistry;
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 import org.messaginghub.pooled.jms.JmsPoolXAConnectionFactory;
@@ -51,12 +49,7 @@ public class PooledJmsWrapper implements ArtemisJmsWrapper {
 
         if (xaResourceRecoveryRegistry != null && recoveryEnable) {
             JmsXAResourceRecoveryHelper recoveryHelper = new JmsXAResourceRecoveryHelper(xaConnectionFactory);
-            xaResourceRecoveryRegistry.addXAResourceRecovery(new XAResourceRecovery() {
-                @Override
-                public XAResource[] getXAResources() {
-                    return recoveryHelper.getXAResources();
-                }
-            });
+            xaResourceRecoveryRegistry.addXAResourceRecovery(() -> recoveryHelper.getXAResources());
         }
 
         return xaConnectionFactory;
