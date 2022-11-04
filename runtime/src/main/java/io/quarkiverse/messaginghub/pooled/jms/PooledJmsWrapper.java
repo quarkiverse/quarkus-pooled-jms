@@ -5,6 +5,7 @@ import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
 
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.eclipse.microprofile.config.ConfigProvider;
 import org.jboss.narayana.jta.jms.JmsXAResourceRecoveryHelper;
 import org.jboss.tm.XAResourceRecovery;
 import org.jboss.tm.XAResourceRecoveryRegistry;
@@ -13,19 +14,14 @@ import org.messaginghub.pooled.jms.JmsPoolXAConnectionFactory;
 
 import io.quarkus.arc.Arc;
 import io.quarkus.artemis.jms.runtime.ArtemisJmsWrapper;
-import io.quarkus.narayana.jta.runtime.TransactionManagerConfiguration;
 
 public class PooledJmsWrapper implements ArtemisJmsWrapper {
     private boolean transaction;
     private PooledJmsRuntimeConfig pooledJmsRuntimeConfig;
 
-    private TransactionManagerConfiguration transactionConfig;
-
-    public PooledJmsWrapper(boolean transaction, PooledJmsRuntimeConfig pooledJmsRuntimeConfig,
-            TransactionManagerConfiguration transactionConfig) {
+    public PooledJmsWrapper(boolean transaction, PooledJmsRuntimeConfig pooledJmsRuntimeConfig) {
         this.transaction = transaction;
         this.pooledJmsRuntimeConfig = pooledJmsRuntimeConfig;
-        this.transactionConfig = transactionConfig;
     }
 
     @Override
@@ -50,7 +46,10 @@ public class PooledJmsWrapper implements ArtemisJmsWrapper {
 
         XAResourceRecoveryRegistry xaResourceRecoveryRegistry = Arc.container().instance(XAResourceRecoveryRegistry.class)
                 .get();
-        if (xaResourceRecoveryRegistry != null && transactionConfig.enableRecovery) {
+        boolean recoveryEnable = ConfigProvider.getConfig().getValue("quarkus.transaction-manager.enable-recovery",
+                Boolean.class);
+
+        if (xaResourceRecoveryRegistry != null && recoveryEnable) {
             JmsXAResourceRecoveryHelper recoveryHelper = new JmsXAResourceRecoveryHelper(xaConnectionFactory);
             xaResourceRecoveryRegistry.addXAResourceRecovery(new XAResourceRecovery() {
                 @Override

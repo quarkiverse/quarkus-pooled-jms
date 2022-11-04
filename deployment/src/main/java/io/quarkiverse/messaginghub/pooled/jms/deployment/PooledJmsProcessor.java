@@ -1,7 +1,7 @@
 package io.quarkiverse.messaginghub.pooled.jms.deployment;
 
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
-import org.jboss.tm.XAResourceRecoveryRegistry;
+import org.jboss.jandex.DotName;
 
 import io.quarkiverse.messaginghub.pooled.jms.PooledJmsRecorder;
 import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
@@ -38,6 +38,7 @@ class PooledJmsProcessor {
 
     @BuildStep
     void unremovableBean(BuildProducer<UnremovableBeanBuildItem> unremovableBeans) {
-        unremovableBeans.produce(UnremovableBeanBuildItem.beanTypes(XAResourceRecoveryRegistry.class));
+        unremovableBeans
+                .produce(UnremovableBeanBuildItem.beanTypes(DotName.createSimple("org.jboss.tm.XAResourceRecoveryRegistry")));
     }
 }
