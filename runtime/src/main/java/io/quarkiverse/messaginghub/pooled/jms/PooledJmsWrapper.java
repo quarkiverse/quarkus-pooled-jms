@@ -1,7 +1,7 @@
 package io.quarkiverse.messaginghub.pooled.jms;
 
-import javax.jms.ConnectionFactory;
-import javax.transaction.TransactionManager;
+import jakarta.jms.ConnectionFactory;
+import jakarta.transaction.TransactionManager;
 
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.eclipse.microprofile.config.ConfigProvider;
