@@ -15,13 +15,11 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-narayana-jta-deployment</artifactId>
-      <optional>true</optional>
+      <artifactId>quarkus-jms-spi-deployment</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.quarkiverse.artemis</groupId>
-      <artifactId>quarkus-artemis-jms-deployment</artifactId>
-      <version>${quarkus-artemis.version}</version>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-narayana-jta-deployment</artifactId>
       <optional>true</optional>
     </dependency>
     <dependency>

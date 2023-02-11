@@ -19,11 +19,6 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>io.quarkiverse.artemis</groupId>
-      <artifactId>quarkus-artemis-jms</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
       <groupId>org.messaginghub</groupId>
       <artifactId>pooled-jms</artifactId>
     </dependency>
