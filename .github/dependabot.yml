@@ -20,7 +20,7 @@ updates:
       - dependency-name: "org.apache.maven.plugins:maven-compiler-plugin"
       - dependency-name: "org.messaginghub:pooled-jms"
         versions: "[3.0,)"
-      - dependency-name: "io.quarkus:quarkus-arc"
+      - dependency-name: "io.quarkus:quarkus-bom"
         versions: "[3.0,)"
       - dependency-name: "io.quarkiverse.artemis:quarkus-artemis-jms"
         versions: "[3.0,)"
