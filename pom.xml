@@ -33,6 +33,18 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>io.quarkiverse.artemis</groupId>
+        <artifactId>quarkus-artemis-bom</artifactId>
+        <version>${quarkus-artemis.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.messaginghub</groupId>
+        <artifactId>pooled-jms</artifactId>
+        <version>${pooled-jms.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
