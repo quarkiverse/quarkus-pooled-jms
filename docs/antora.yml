@@ -1,5 +1,5 @@
 name: quarkus-pooled-jms
 title: Quarkus Messaginghub Pooled JMS
-version: 1.0.x
+version: 1.x
 nav:
   - modules/ROOT/nav.adoc
