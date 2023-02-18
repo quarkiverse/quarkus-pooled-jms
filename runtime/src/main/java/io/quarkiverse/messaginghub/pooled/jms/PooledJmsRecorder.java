@@ -1,6 +1,9 @@
 package io.quarkiverse.messaginghub.pooled.jms;
 
-import io.quarkus.artemis.jms.runtime.ArtemisJmsWrapper;
+import java.util.function.Function;
+
+import javax.jms.ConnectionFactory;
+
 import io.quarkus.runtime.annotations.Recorder;
 
 @Recorder
@@ -11,7 +14,10 @@ public class PooledJmsRecorder {
         this.pooledJmsRuntimeConfig = config;
     }
 
-    public ArtemisJmsWrapper getWrapper(boolean transaction) {
-        return new PooledJmsWrapper(transaction, pooledJmsRuntimeConfig);
+    public Function<ConnectionFactory, Object> getWrapper(boolean transaction) {
+        return cf -> {
+            PooledJmsWrapper wrapper = new PooledJmsWrapper(transaction, pooledJmsRuntimeConfig);
+            return wrapper.wrapConnectionFactory(cf);
+        };
     }
 }
