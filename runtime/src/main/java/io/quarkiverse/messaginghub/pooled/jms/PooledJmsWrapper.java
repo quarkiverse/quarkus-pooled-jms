@@ -27,6 +27,8 @@ public class PooledJmsWrapper {
 
         if (transaction && pooledJmsRuntimeConfig.xaEnabled) {
             return getXAConnectionFactory(connectionFactory);
+        } else if (transaction) {
+            return getLocalTransactionConnectionFactory(connectionFactory);
         } else {
             return getConnectionFactory(connectionFactory);
         }
@@ -50,6 +52,16 @@ public class PooledJmsWrapper {
         }
 
         return xaConnectionFactory;
+    }
+
+    private ConnectionFactory getLocalTransactionConnectionFactory(ConnectionFactory connectionFactory) {
+        TransactionManager transactionManager = Arc.container().instance(TransactionManager.class).get();
+
+        JmsPoolLocalTransactionConnectionFactory poolLocalTransactionConnectionFactory = new JmsPoolLocalTransactionConnectionFactory();
+        poolLocalTransactionConnectionFactory.setTransactionManager(transactionManager);
+        pooledJmsRuntimeConfigureConnectionFactory(poolLocalTransactionConnectionFactory, connectionFactory);
+
+        return poolLocalTransactionConnectionFactory;
     }
 
     private ConnectionFactory getConnectionFactory(ConnectionFactory connectionFactory) {
