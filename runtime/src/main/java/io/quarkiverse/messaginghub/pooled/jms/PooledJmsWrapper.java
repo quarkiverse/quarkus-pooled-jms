@@ -25,9 +25,9 @@ public class PooledJmsWrapper {
             return connectionFactory;
         }
 
-        if (transaction && pooledJmsRuntimeConfig.xaEnabled) {
+        if (transaction && pooledJmsRuntimeConfig.transaction.equals(TransactionIntegration.XA)) {
             return getXAConnectionFactory(connectionFactory);
-        } else if (transaction) {
+        } else if (transaction && pooledJmsRuntimeConfig.transaction.equals(TransactionIntegration.ENABLED)) {
             return getLocalTransactionConnectionFactory(connectionFactory);
         } else {
             return getConnectionFactory(connectionFactory);

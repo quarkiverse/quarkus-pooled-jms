@@ -10,7 +10,7 @@ public class JmsXATestProfile implements QuarkusTestProfile {
     public Map<String, String> getConfigOverrides() {
         HashMap<String, String> props = new HashMap<>();
 
-        props.put("quarkus.pooled-jms.xa.enabled", "true");
+        props.put("quarkus.pooled-jms.transaction", "xa");
         props.put("quarkus.transaction-manager.enable-recovery", "true");
         return props;
     }

@@ -25,11 +25,16 @@ public class PooledLocalTransactionConnection extends PooledConnection {
 
     @Override
     public Session createSession(boolean transacted, int ackMode) throws JMSException {
-        JmsPoolSession session = (JmsPoolSession) super.createSession(transacted, ackMode);
 
         try {
-            if (transactionManager != null && transactionManager.getStatus() != Status.STATUS_NO_TRANSACTION
-                    && transacted) {
+            boolean isTransacted = transactionManager != null && transactionManager.getStatus() != Status.STATUS_NO_TRANSACTION;
+
+            if (isTransacted) {
+                transacted = true;
+                ackMode = Session.SESSION_TRANSACTED;
+            }
+            JmsPoolSession session = (JmsPoolSession) super.createSession(transacted, ackMode);
+            if (isTransacted) {
                 session.setIgnoreClose(true);
                 transactionManager.getTransaction().registerSynchronization(new Synchronization() {
                     @Override
@@ -52,14 +57,17 @@ public class PooledLocalTransactionConnection extends PooledConnection {
                             try {
                                 session.setIgnoreClose(false);
                                 session.close();
-                                decrementReferenceCount();
                             } catch (JMSException e) {
                                 throw new RuntimeException(e);
+                            } finally {
+                                decrementReferenceCount();
                             }
                         }
                     }
                 });
                 incrementReferenceCount();
+            } else {
+                session.setIgnoreClose(false);
             }
             return session;
         } catch (RollbackException e) {
