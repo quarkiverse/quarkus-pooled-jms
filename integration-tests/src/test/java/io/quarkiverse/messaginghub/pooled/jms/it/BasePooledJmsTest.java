@@ -7,16 +7,13 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import io.quarkus.test.junit.QuarkusTest;
-
-@QuarkusTest
-public class PooledJmsResourceTest {
+abstract public class BasePooledJmsTest {
 
     @Test
-    public void testXA() {
+    public void testCommit() {
         String body = UUID.randomUUID().toString();
 
-        given().body(body)
+        given().body(body).queryParam("transacted", isTransacted())
                 .when().post("/pooled-jms")
                 .then()
                 .statusCode(204);
@@ -30,7 +27,7 @@ public class PooledJmsResourceTest {
 
     @Test
     public void testRollback() {
-        given().body("fail")
+        given().body("fail").queryParam("transacted", isTransacted())
                 .when().post("/pooled-jms")
                 .then()
                 .statusCode(204);
@@ -40,4 +37,6 @@ public class PooledJmsResourceTest {
                 .then()
                 .statusCode(204);
     }
+
+    abstract boolean isTransacted();
 }
