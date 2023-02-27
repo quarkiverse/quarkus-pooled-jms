@@ -24,11 +24,14 @@ import javax.jms.JMSContext;
 import javax.jms.JMSException;
 import javax.jms.JMSProducer;
 import javax.jms.Message;
+import javax.jms.Session;
 import javax.transaction.TransactionManager;
 import javax.transaction.Transactional;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 
 @Path("/pooled-jms")
 @ApplicationScoped
@@ -48,16 +51,18 @@ public class PooledJmsResource {
 
     @POST
     @Transactional
-    public void post(String message) throws Exception {
-        send(message);
+    public void post(@QueryParam("transacted") @DefaultValue("false") Boolean transacted,
+            String message) throws Exception {
+        send(message, transacted);
 
         if ("fail".equals(message)) {
             tm.setRollbackOnly();
         }
     }
 
-    private void send(String body) {
-        try (JMSContext context = connectionFactory.createContext()) {
+    private void send(String body, Boolean transacted) {
+        try (JMSContext context = connectionFactory.createContext(
+                transacted ? Session.SESSION_TRANSACTED : Session.AUTO_ACKNOWLEDGE)) {
             JMSProducer producer = context.createProducer();
             producer.send(context.createQueue(queue), body);
         }
