@@ -2,7 +2,9 @@ package io.quarkiverse.messaginghub.pooled.jms.deployment;
 
 import org.jboss.jandex.DotName;
 
+import io.quarkiverse.messaginghub.pooled.jms.PooledJmsDecorator;
 import io.quarkiverse.messaginghub.pooled.jms.PooledJmsRecorder;
+import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
 import io.quarkus.deployment.Capabilities;
 import io.quarkus.deployment.Capability;
@@ -24,10 +26,13 @@ class PooledJmsProcessor {
     }
 
     @BuildStep
-    void reflective(BuildProducer<ReflectiveClassBuildItem> producer) {
-        producer.produce(
+    void build(BuildProducer<AdditionalBeanBuildItem> additionalBeans,
+            BuildProducer<ReflectiveClassBuildItem> reflectiveClasses) {
+        additionalBeans.produce(new AdditionalBeanBuildItem(PooledJmsDecorator.class));
+        reflectiveClasses.produce(
                 new ReflectiveClassBuildItem(true, false, "org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory"));
-        producer.produce(new ReflectiveClassBuildItem(true, false, "org.apache.commons.pool2.impl.DefaultEvictionPolicy"));
+        reflectiveClasses
+                .produce(new ReflectiveClassBuildItem(true, false, "org.apache.commons.pool2.impl.DefaultEvictionPolicy"));
     }
 
     @BuildStep
