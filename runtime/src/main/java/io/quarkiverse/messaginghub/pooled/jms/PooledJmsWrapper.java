@@ -3,7 +3,6 @@ package io.quarkiverse.messaginghub.pooled.jms;
 import jakarta.jms.ConnectionFactory;
 import jakarta.transaction.TransactionManager;
 
-import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.jboss.narayana.jta.jms.JmsXAResourceRecoveryHelper;
 import org.jboss.tm.XAResourceRecoveryRegistry;
@@ -11,9 +10,8 @@ import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 import org.messaginghub.pooled.jms.JmsPoolXAConnectionFactory;
 
 import io.quarkus.arc.Arc;
-import io.quarkus.artemis.jms.runtime.ArtemisJmsWrapper;
 
-public class PooledJmsWrapper implements ArtemisJmsWrapper {
+public class PooledJmsWrapper {
     private boolean transaction;
     private PooledJmsRuntimeConfig pooledJmsRuntimeConfig;
 
@@ -22,8 +20,7 @@ public class PooledJmsWrapper implements ArtemisJmsWrapper {
         this.pooledJmsRuntimeConfig = pooledJmsRuntimeConfig;
     }
 
-    @Override
-    public ConnectionFactory wrapConnectionFactory(ActiveMQConnectionFactory connectionFactory) {
+    public ConnectionFactory wrapConnectionFactory(ConnectionFactory connectionFactory) {
         if (!pooledJmsRuntimeConfig.poolingEnabled) {
             return connectionFactory;
         }
@@ -35,7 +32,7 @@ public class PooledJmsWrapper implements ArtemisJmsWrapper {
         }
     }
 
-    private ConnectionFactory getXAConnectionFactory(ActiveMQConnectionFactory connectionFactory) {
+    private ConnectionFactory getXAConnectionFactory(ConnectionFactory connectionFactory) {
         TransactionManager transactionManager = Arc.container().instance(TransactionManager.class).get();
 
         JmsPoolXAConnectionFactory xaConnectionFactory = new JmsPoolXAConnectionFactory();
@@ -55,7 +52,7 @@ public class PooledJmsWrapper implements ArtemisJmsWrapper {
         return xaConnectionFactory;
     }
 
-    private ConnectionFactory getConnectionFactory(ActiveMQConnectionFactory connectionFactory) {
+    private ConnectionFactory getConnectionFactory(ConnectionFactory connectionFactory) {
         JmsPoolConnectionFactory poolConnectionFactory = new JmsPoolConnectionFactory();
         pooledJmsRuntimeConfigureConnectionFactory(poolConnectionFactory, connectionFactory);
 
@@ -63,7 +60,7 @@ public class PooledJmsWrapper implements ArtemisJmsWrapper {
     }
 
     private void pooledJmsRuntimeConfigureConnectionFactory(JmsPoolConnectionFactory poolConnectionFactory,
-            ActiveMQConnectionFactory connectionFactory) {
+            ConnectionFactory connectionFactory) {
         poolConnectionFactory.setConnectionFactory(connectionFactory);
         poolConnectionFactory.setMaxConnections(pooledJmsRuntimeConfig.maxConnections);
         poolConnectionFactory.setConnectionIdleTimeout(pooledJmsRuntimeConfig.connectionIdleTimeout);

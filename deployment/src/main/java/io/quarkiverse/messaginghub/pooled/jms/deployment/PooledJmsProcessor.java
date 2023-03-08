@@ -1,11 +1,9 @@
 package io.quarkiverse.messaginghub.pooled.jms.deployment;
 
-import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.jboss.jandex.DotName;
 
 import io.quarkiverse.messaginghub.pooled.jms.PooledJmsRecorder;
 import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
-import io.quarkus.artemis.jms.deployment.ArtemisJmsWrapperBuildItem;
 import io.quarkus.deployment.Capabilities;
 import io.quarkus.deployment.Capability;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -14,6 +12,7 @@ import io.quarkus.deployment.annotations.ExecutionTime;
 import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
+import io.quarkus.jms.spi.deployment.ConnectionFactoryWrapperBuildItem;
 
 class PooledJmsProcessor {
 
@@ -26,14 +25,15 @@ class PooledJmsProcessor {
 
     @BuildStep
     void reflective(BuildProducer<ReflectiveClassBuildItem> producer) {
-        producer.produce(new ReflectiveClassBuildItem(true, false, ActiveMQConnectionFactory.class));
+        producer.produce(
+                new ReflectiveClassBuildItem(true, false, "org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory"));
         producer.produce(new ReflectiveClassBuildItem(true, false, "org.apache.commons.pool2.impl.DefaultEvictionPolicy"));
     }
 
     @BuildStep
     @Record(ExecutionTime.RUNTIME_INIT)
-    ArtemisJmsWrapperBuildItem wrap(Capabilities capabilities, PooledJmsRecorder recorder) {
-        return new ArtemisJmsWrapperBuildItem(recorder.getWrapper(capabilities.isPresent(Capability.TRANSACTIONS)));
+    ConnectionFactoryWrapperBuildItem wrap(Capabilities capabilities, PooledJmsRecorder recorder) {
+        return new ConnectionFactoryWrapperBuildItem(recorder.getWrapper(capabilities.isPresent(Capability.TRANSACTIONS)));
     }
 
     @BuildStep
