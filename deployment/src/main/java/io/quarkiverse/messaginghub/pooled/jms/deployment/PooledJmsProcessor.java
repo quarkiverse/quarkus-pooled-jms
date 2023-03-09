@@ -30,9 +30,11 @@ class PooledJmsProcessor {
             BuildProducer<ReflectiveClassBuildItem> reflectiveClasses) {
         additionalBeans.produce(new AdditionalBeanBuildItem(PooledJmsDecorator.class));
         reflectiveClasses.produce(
-                new ReflectiveClassBuildItem(true, false, "org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory"));
-        reflectiveClasses
-                .produce(new ReflectiveClassBuildItem(true, false, "org.apache.commons.pool2.impl.DefaultEvictionPolicy"));
+                ReflectiveClassBuildItem.builder("org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory")
+                        .methods(true).fields(false).build());
+        reflectiveClasses.produce(
+                ReflectiveClassBuildItem.builder("org.apache.commons.pool2.impl.DefaultEvictionPolicy")
+                        .methods(true).fields(false).build());
     }
 
     @BuildStep
