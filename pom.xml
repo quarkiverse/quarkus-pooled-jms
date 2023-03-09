@@ -8,7 +8,7 @@
   </parent>
   <groupId>io.quarkiverse.messaginghub</groupId>
   <artifactId>quarkus-pooled-jms-parent</artifactId>
-  <version>2.0.0.CR2</version>
+  <version>999-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Quarkus - Pooled Jms - Parent</name>
   <modules>
@@ -74,8 +74,4 @@
       </modules>
     </profile>
   </profiles>
-
-  <scm>
-    <tag>2.0.0.CR2</tag>
-  </scm>
 </project>
