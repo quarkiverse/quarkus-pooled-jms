@@ -14,7 +14,8 @@ public class PooledJmsRuntimeConfig {
     public boolean poolingEnabled;
 
     /**
-     * Whether to enable {@link javax.jms.XAConnection} support and integrate with {@link javax.transaction.TransactionManager}
+     * Whether to enable {@link jakarta.jms.XAConnection} support and integrate with
+     * {@link jakarta.transaction.TransactionManager}
      * If you enable it, you need to include `io.quarkus:quarkus-narayana-jta` extension.
      */
     @ConfigItem(defaultValue = "disabled")
