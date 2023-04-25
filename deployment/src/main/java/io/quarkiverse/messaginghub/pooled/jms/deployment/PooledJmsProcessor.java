@@ -6,6 +6,7 @@ import io.quarkiverse.messaginghub.pooled.jms.PooledJmsDecorator;
 import io.quarkiverse.messaginghub.pooled.jms.PooledJmsRecorder;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
+import io.quarkus.bootstrap.classloading.QuarkusClassLoader;
 import io.quarkus.deployment.Capabilities;
 import io.quarkus.deployment.Capability;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -19,6 +20,7 @@ import io.quarkus.jms.spi.deployment.ConnectionFactoryWrapperBuildItem;
 class PooledJmsProcessor {
 
     private static final String FEATURE = "messaginghub-pooled-jms";
+    private static final String ACTIVEMQ_CONNECTION_FACTORY = "org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory";
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -29,8 +31,10 @@ class PooledJmsProcessor {
     void build(BuildProducer<AdditionalBeanBuildItem> additionalBeans,
             BuildProducer<ReflectiveClassBuildItem> reflectiveClasses) {
         additionalBeans.produce(new AdditionalBeanBuildItem(PooledJmsDecorator.class));
-        reflectiveClasses.produce(
-                new ReflectiveClassBuildItem(true, false, "org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory"));
+
+        if (QuarkusClassLoader.isClassPresentAtRuntime(ACTIVEMQ_CONNECTION_FACTORY)) {
+            reflectiveClasses.produce(new ReflectiveClassBuildItem(true, false, ACTIVEMQ_CONNECTION_FACTORY));
+        }
         reflectiveClasses
                 .produce(new ReflectiveClassBuildItem(true, false, "org.apache.commons.pool2.impl.DefaultEvictionPolicy"));
     }
