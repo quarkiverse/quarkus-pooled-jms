@@ -24,7 +24,7 @@
     <quarkus-artemis.version>2.1.0</quarkus-artemis.version>
     <pooled-jms.version>2.0.5</pooled-jms.version>
     <narayana.version>5.13.1.Final</narayana.version>
-    <jboss-transaction-spi.version>7.6.1.Final</jboss-transaction-spi.version>
+    <jboss-transaction-spi.version>8.0.0.Final</jboss-transaction-spi.version>
   </properties>
   <dependencyManagement>
     <dependencies>
