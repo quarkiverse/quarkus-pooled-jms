@@ -4,8 +4,10 @@ import org.jboss.jandex.DotName;
 
 import io.quarkiverse.messaginghub.pooled.jms.PooledJmsDecorator;
 import io.quarkiverse.messaginghub.pooled.jms.PooledJmsRecorder;
+import io.quarkiverse.messaginghub.pooled.jms.transaction.XATransactionSupport;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
+import io.quarkus.bootstrap.classloading.QuarkusClassLoader;
 import io.quarkus.deployment.Capabilities;
 import io.quarkus.deployment.Capability;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -43,7 +45,9 @@ class PooledJmsProcessor {
 
     @BuildStep
     void unremovableBean(BuildProducer<UnremovableBeanBuildItem> unremovableBeans) {
-        unremovableBeans
-                .produce(UnremovableBeanBuildItem.beanTypes(DotName.createSimple("org.jboss.tm.XAResourceRecoveryRegistry")));
+        if (QuarkusClassLoader.isClassPresentAtRuntime(XATransactionSupport.XA_RECOVERY_REGISTRY_CLASSNAME)) {
+            unremovableBeans.produce(UnremovableBeanBuildItem
+                    .beanTypes(DotName.createSimple(XATransactionSupport.XA_RECOVERY_REGISTRY_CLASSNAME)));
+        }
     }
 }
