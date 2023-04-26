@@ -23,8 +23,6 @@
     <quarkus.version>2.16.6.Final</quarkus.version>
     <quarkus-artemis.version>2.1.0</quarkus-artemis.version>
     <pooled-jms.version>2.0.5</pooled-jms.version>
-    <narayana.version>5.13.1.Final</narayana.version>
-    <jboss-transaction-spi.version>7.6.1.Final</jboss-transaction-spi.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -39,16 +37,6 @@
         <groupId>org.messaginghub</groupId>
         <artifactId>pooled-jms</artifactId>
         <version>${pooled-jms.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.narayana.jta</groupId>
-        <artifactId>narayana-jta</artifactId>
-        <version>${narayana.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss</groupId>
-        <artifactId>jboss-transaction-spi</artifactId>
-        <version>${jboss-transaction-spi.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

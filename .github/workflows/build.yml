@@ -22,6 +22,7 @@ on:
       - '*.adoc'
       - '*.txt'
       - '.all-contributorsrc'
+  workflow_dispatch:
 
 jobs:
   build:
