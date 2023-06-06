@@ -16,7 +16,7 @@
     <module>runtime</module>
   </modules>
   <scm>
-    <connection>:git:git@github.com:quarkiverse/quarkus-pooled-jms.git</connection>
+    <connection>scm:git:git@github.com:quarkiverse/quarkus-pooled-jms.git</connection>
     <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-pooled-jms.git</developerConnection>
     <url>https://github.com/quarkiverse/quarkus-pooled-jms</url>
   </scm>
