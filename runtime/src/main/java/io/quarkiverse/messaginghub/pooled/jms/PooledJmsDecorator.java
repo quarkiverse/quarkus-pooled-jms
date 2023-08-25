@@ -12,6 +12,8 @@ import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSContext;
 import jakarta.jms.JMSException;
 
+import io.quarkus.arc.impl.Reflections;
+
 @Priority(0)
 @Decorator
 public class PooledJmsDecorator implements ConnectionFactory {
@@ -19,6 +21,9 @@ public class PooledJmsDecorator implements ConnectionFactory {
     @Any
     @Delegate
     ConnectionFactory delegate;
+
+    @Inject
+    PooledJmsRuntimeConfig config;
 
     PooledJmsWrapper wrapper;
     ConnectionFactory factory;
@@ -30,7 +35,13 @@ public class PooledJmsDecorator implements ConnectionFactory {
 
     private ConnectionFactory getConnectionFactory() {
         if (factory == null) {
-            factory = wrapper.wrapConnectionFactory(delegate);
+            Object subClass = Reflections.readField(delegate.getClass(), "subclass", delegate);
+
+            if (config.transaction.equals(TransactionIntegration.XA)) {
+                factory = wrapper.wrapConnectionFactory((ConnectionFactory) subClass);
+            } else {
+                factory = wrapper.wrapConnectionFactory(delegate);
+            }
         }
         return isContext ? delegate : factory;
     }
