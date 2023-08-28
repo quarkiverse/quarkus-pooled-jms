@@ -1,7 +1,5 @@
 package io.quarkiverse.messaginghub.pooled.jms;
 
-import java.util.function.Function;
-
 import jakarta.annotation.Priority;
 import jakarta.decorator.Decorator;
 import jakarta.decorator.Delegate;
@@ -11,6 +9,9 @@ import jakarta.jms.Connection;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSContext;
 import jakarta.jms.JMSException;
+
+import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
+import org.messaginghub.pooled.jms.JmsPoolXAConnectionFactory;
 
 @Priority(0)
 @Decorator
@@ -22,7 +23,6 @@ public class PooledJmsDecorator implements ConnectionFactory {
 
     PooledJmsWrapper wrapper;
     ConnectionFactory factory;
-    boolean isContext = false;
 
     public PooledJmsDecorator(PooledJmsRuntimeConfig config) {
         wrapper = new PooledJmsWrapper(true, config);
@@ -32,46 +32,51 @@ public class PooledJmsDecorator implements ConnectionFactory {
         if (factory == null) {
             factory = wrapper.wrapConnectionFactory(delegate);
         }
-        return isContext ? delegate : factory;
+        return factory;
     }
 
     @Override
     public Connection createConnection() throws JMSException {
-        return getConnectionFactory().createConnection();
+        return isInJmsPoolConnectionFactory() ? delegate.createConnection() : getConnectionFactory().createConnection();
     }
 
     @Override
     public Connection createConnection(final String userName, final String password) throws JMSException {
-        return getConnectionFactory().createConnection(userName, password);
+        return isInJmsPoolConnectionFactory() ? delegate.createConnection(userName, password)
+                : getConnectionFactory().createConnection(userName, password);
     }
 
     @Override
     public JMSContext createContext() {
-        return runInContext(ConnectionFactory::createContext);
+        return getConnectionFactory().createContext();
     }
 
     @Override
     public JMSContext createContext(final String userName, final String password) {
-        return runInContext(cf -> cf.createContext(userName, password));
+        return getConnectionFactory().createContext(userName, password);
     }
 
     @Override
     public JMSContext createContext(final String userName, final String password, final int sessionMode) {
-        return runInContext(cf -> cf.createContext(userName, password, sessionMode));
+        return getConnectionFactory().createContext(userName, password, sessionMode);
     }
 
     @Override
     public JMSContext createContext(final int sessionMode) {
-        return runInContext(cf -> cf.createContext(sessionMode));
+        return getConnectionFactory().createContext(sessionMode);
     }
 
-    private JMSContext runInContext(Function<ConnectionFactory, JMSContext> process) {
-        ConnectionFactory cf = getConnectionFactory();
-        isContext = true;
-        try {
-            return process.apply(cf);
-        } finally {
-            isContext = false;
+    private boolean isInJmsPoolConnectionFactory() {
+        for (StackTraceElement stack : Thread.currentThread().getStackTrace()) {
+            String className = stack.getClassName();
+            String methodName = stack.getMethodName();
+            System.out.println("className is " + stack.getClassName() + " and method is " + stack.getMethodName());
+            if ((className.equals(JmsPoolConnectionFactory.class.getName())
+                    || className.equals(JmsPoolXAConnectionFactory.class.getName()))
+                    && methodName.equals("createProviderConnection")) {
+                return true;
+            }
         }
+        return false;
     }
 }
