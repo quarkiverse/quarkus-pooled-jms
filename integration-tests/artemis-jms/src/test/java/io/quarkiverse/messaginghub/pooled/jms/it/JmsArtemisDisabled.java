@@ -12,6 +12,7 @@ public class JmsArtemisDisabled implements QuarkusTestProfile {
         HashMap<String, String> props = new HashMap<>();
 
         props.put("quarkus.artemis.enabled", "false");
+        //props.put("quarkus.pooled-jms.transaction", "xa");
         return props;
     }
 
