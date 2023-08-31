@@ -92,15 +92,9 @@ public class PooledJmsDecorator implements ComposedConnectionFactory {
     }
 
     private boolean isInJmsPoolConnectionFactory() {
-        for (StackTraceElement stack : Thread.currentThread().getStackTrace()) {
-            String className = stack.getClassName();
-            String methodName = stack.getMethodName();
-            if ((className.equals(JmsPoolConnectionFactory.class.getName())
-                    || className.equals(JmsPoolXAConnectionFactory.class.getName()))
-                    && methodName.equals("createProviderConnection")) {
-                return true;
-            }
-        }
-        return false;
+        return StackWalker.getInstance().walk(
+                frames -> frames.anyMatch(f -> (f.getClassName().equals(JmsPoolConnectionFactory.class.getName())
+                        || f.getClassName().equals(JmsPoolXAConnectionFactory.class.getName())
+                                && f.getMethodName().equals("createProviderConnection"))));
     }
 }
