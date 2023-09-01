@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import jakarta.jms.ConnectionFactory;
 
+import io.quarkus.runtime.RuntimeValue;
 import io.quarkus.runtime.annotations.Recorder;
 
 @Recorder
@@ -19,5 +20,9 @@ public class PooledJmsRecorder {
             PooledJmsWrapper wrapper = new PooledJmsWrapper(transaction, pooledJmsRuntimeConfig);
             return wrapper.wrapConnectionFactory(cf);
         };
+    }
+
+    public RuntimeValue<PooledJmsWrapper> getPooledJmsWrapper(boolean transaction) {
+        return new RuntimeValue<>(new PooledJmsWrapper(transaction, pooledJmsRuntimeConfig));
     }
 }
