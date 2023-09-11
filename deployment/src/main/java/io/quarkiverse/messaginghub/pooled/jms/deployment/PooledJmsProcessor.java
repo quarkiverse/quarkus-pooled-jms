@@ -1,11 +1,13 @@
 package io.quarkiverse.messaginghub.pooled.jms.deployment;
 
+import jakarta.inject.Singleton;
+
 import org.jboss.jandex.DotName;
 
-import io.quarkiverse.messaginghub.pooled.jms.PooledJmsDecorator;
 import io.quarkiverse.messaginghub.pooled.jms.PooledJmsRecorder;
+import io.quarkiverse.messaginghub.pooled.jms.PooledJmsWrapper;
 import io.quarkiverse.messaginghub.pooled.jms.transaction.XATransactionSupport;
-import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
+import io.quarkus.arc.deployment.SyntheticBeanBuildItem;
 import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
 import io.quarkus.bootstrap.classloading.QuarkusClassLoader;
 import io.quarkus.deployment.Capabilities;
@@ -28,10 +30,7 @@ class PooledJmsProcessor {
     }
 
     @BuildStep
-    void build(BuildProducer<AdditionalBeanBuildItem> additionalBeans,
-            BuildProducer<ReflectiveClassBuildItem> reflectiveClasses) {
-        additionalBeans.produce(new AdditionalBeanBuildItem(PooledJmsDecorator.class));
-
+    void build(BuildProducer<ReflectiveClassBuildItem> reflectiveClasses) {
         reflectiveClasses.produce(
                 ReflectiveClassBuildItem.builder("org.apache.commons.pool2.impl.DefaultEvictionPolicy")
                         .methods(true).fields(false).build());
@@ -39,8 +38,16 @@ class PooledJmsProcessor {
 
     @BuildStep
     @Record(ExecutionTime.RUNTIME_INIT)
-    ConnectionFactoryWrapperBuildItem wrap(Capabilities capabilities, PooledJmsRecorder recorder) {
-        return new ConnectionFactoryWrapperBuildItem(recorder.getWrapper(capabilities.isPresent(Capability.TRANSACTIONS)));
+    void wrap(Capabilities capabilities, PooledJmsRecorder recorder,
+            BuildProducer<ConnectionFactoryWrapperBuildItem> wrapper,
+            BuildProducer<SyntheticBeanBuildItem> syntheticBeans) {
+        wrapper.produce(
+                new ConnectionFactoryWrapperBuildItem(recorder.getWrapper(capabilities.isPresent(Capability.TRANSACTIONS))));
+        syntheticBeans.produce(SyntheticBeanBuildItem.configure(PooledJmsWrapper.class)
+                .scope(Singleton.class)
+                .runtimeValue(recorder.getPooledJmsWrapper(capabilities.isPresent(Capability.TRANSACTIONS)))
+                .defaultBean().setRuntimeInit()
+                .done());
     }
 
     @BuildStep

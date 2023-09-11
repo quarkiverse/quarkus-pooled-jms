@@ -5,7 +5,7 @@ import io.quarkus.test.junit.TestProfile;
 
 @QuarkusTest
 @TestProfile(JmsArtemisDisabled.class)
-public class PooledDecoratorTest extends BasePooledJmsTest {
+public class PooledCustomerConnectionFactoryTest extends BasePooledJmsTest {
     @Override
     boolean isTransacted() {
         return true;
