@@ -16,6 +16,88 @@ In your `pom.xml` file, add:
 </dependency>
 ----
 
+== Pooling support
+It is enabled by default. And we test for `quarkus-artemis` and `quarkus-qpid-jms`
+[NOTE]
+====
+`clientID` and `durableSubscriptionName` are not supported in pooling connections. If `setClientID` is called on a `reused` connection from the pool, an `IllegalStateException` will be thrown. You will get some error messages such like `Cause: setClientID can only be called directly after the connection is created`
+====
+
+== XA transaction support
+It needs to add `quarkus-narayana-jta` extension:
+[source,xml]
+----
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-narayana-jta</artifactId>
+</dependency>
+----
+and add the following configuration to your `application.properties`:
+[source,properties]
+----
+quarkus.pooled-jms.transaction=xa
+quarkus.transaction-manager.enable-recovery=true
+----
+XA support is only available with `quarkus-artemis-jms`.
+
+== Custom ConnectionFactory
+For those messaging drivers which do not have quarkus extension, such as `ibmmq-client`. You need to create a custom `ConnectionFactory` and wrap it by yourself. Here is an example:
+[source,java]
+----
+@Produces
+public ConnectionFactory createXAConnectionFactory(PooledJmsWrapper wrapper) {
+    MQXAConnectionFactory mq = new MQXAConnectionFactory();
+    try {
+        mq.setHostName(ConfigProvider.getConfig().getValue("ibm.mq.host", String.class));
+        mq.setPort(ConfigProvider.getConfig().getValue("ibm.mq.port", Integer.class));
+        mq.setChannel(ConfigProvider.getConfig().getValue("ibm.mq.channel", String.class));
+        mq.setQueueManager(ConfigProvider.getConfig().getValue("ibm.mq.queueManagerName", String.class));
+        mq.setTransportType(WMQConstants.WMQ_CM_CLIENT);
+        mq.setStringProperty(WMQConstants.USERID,
+            ConfigProvider.getConfig().getValue("ibm.mq.user", String.class));
+        mq.setStringProperty(WMQConstants.PASSWORD,
+            ConfigProvider.getConfig().getValue("ibm.mq.password", String.class));
+    } catch (Exception e) {
+        throw new RuntimeException("Unable to create new IBM MQ connection factory", e);
+    }
+    return wrapper.wrapConnectionFactory(mq);
+}
+----
+[NOTE]
+====
+If you use `ibmmq-client` to consume messages and enable XA, you should make sure it is running in a transaction. Otherwise, you will get an error like `MQRC_SYNCPOINT_NOT_AVAILABLE`.
+When you are using `ibmmq-client` and rollback a transaction, there will be a WARN message like:
+[source]
+----
+WARN  [com.arj.ats.jta] (executor-thread-1) ARJUNA016045: attempted rollback of < formatId=131077, gtrid_length=35, bqual_length=36, tx_uid=0:ffffc0a86510:aed3:650915d7:16, node_name=quarkus, branch_uid=0:ffffc0a86510:aed3:650915d7:1f, subordinatenodename=null, eis_name=0 > (com.ibm.mq.jmqi.JmqiXAResource@79786dde) failed with exception code XAException.XAER_NOTA: javax.transaction.xa.XAException: The method 'xa_rollback' has failed with errorCode '-4'.
+----
+it may be ignored and can be assumed that MQ has discarded the transaction's work.
+====
+
+== Local JMS Transaction support
+It needs to set the following configuration:
+[source, properties]
+----
+quarkus.pooled-jms.transaction=enabled
+----
+and if it is running in a transaction, it can mark the session with `SESSION_TRANSACTED` and commit or rollback the session according to the outcome of the globe transaction. The example like sending message:
+[source,java]
+----
+@Transactional
+protected void send(String body, ConnectionFactory factory, String queueName) {
+    try (JMSContext context = factory.createContext()) {
+        JMSProducer producer = context.createProducer();
+        producer.send(ActiveMQDestination.createQueue(queueName), body);
+
+        log.info("send {}", body);
+    }
+}
+----
+[NOTE]
+====
+It is different from the XA support. So if there is any issue happening during the session committing, the transaction will not be rollbacked.
+====
+
 [[extension-configuration-reference]]
 == Extension Configuration Reference
 
