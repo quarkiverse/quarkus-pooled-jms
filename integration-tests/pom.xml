@@ -9,7 +9,17 @@
   <artifactId>quarkus-pooled-jms-integration-tests</artifactId>
   <name>Quarkus - Pooled Jms - Integration Tests</name>
   <packaging>pom</packaging>
-
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.quarkiverse.artemis</groupId>
+        <artifactId>quarkus-artemis-bom</artifactId>
+        <version>${quarkus-artemis.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <modules>
     <module>artemis-jms</module>
     <module>qpid-jms</module>
