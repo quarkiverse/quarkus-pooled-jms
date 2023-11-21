@@ -8,4 +8,4 @@ metadata:
   guide: "https://quarkiverse.github.io/quarkiverse-docs/quarkus-pooled-jms/dev/index.html"
   categories:
     - "miscellaneous"
-  status: "preview"
+  status: "stable"
