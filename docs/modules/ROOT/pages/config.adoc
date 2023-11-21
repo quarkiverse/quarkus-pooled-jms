@@ -12,6 +12,7 @@ h|Default
 
 a| [[quarkus-pooled-jms_quarkus.pooled-jms.pooling.enabled]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.pooling.enabled[quarkus.pooled-jms.pooling.enabled]`
 
+
 [.description]
 --
 Whether to enable pooling capabilities for JMS connections.
@@ -28,9 +29,10 @@ endif::add-copy-button-to-env-var[]
 
 a| [[quarkus-pooled-jms_quarkus.pooled-jms.transaction]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.transaction[quarkus.pooled-jms.transaction]`
 
+
 [.description]
 --
-Whether to enable `javax.jms.XAConnection` support and integrate with `javax.transaction.TransactionManager` If you enable it, you need to include `io.quarkus:quarkus-narayana-jta` extension.
+Whether to enable `jakarta.jms.XAConnection` support and integrate with `jakarta.transaction.TransactionManager` If you enable it, you need to include `io.quarkus:quarkus-narayana-jta` extension.
 
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_POOLED_JMS_TRANSACTION+++[]
@@ -44,6 +46,7 @@ endif::add-copy-button-to-env-var[]
 
 
 a| [[quarkus-pooled-jms_quarkus.pooled-jms.max-connections]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.max-connections[quarkus.pooled-jms.max-connections]`
+
 
 [.description]
 --
@@ -61,6 +64,7 @@ endif::add-copy-button-to-env-var[]
 
 a| [[quarkus-pooled-jms_quarkus.pooled-jms.connection-idle-timeout]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.connection-idle-timeout[quarkus.pooled-jms.connection-idle-timeout]`
 
+
 [.description]
 --
 The idle timeout (default 30 seconds) controls how long a Connection that hasn't been or currently isn't loaned out to any client will remain idle in the Connection pool before it is eligible to be closed and discarded. To disable idle timeouts the value should be set to 0 or a negative number.
@@ -76,6 +80,7 @@ endif::add-copy-button-to-env-var[]
 
 
 a| [[quarkus-pooled-jms_quarkus.pooled-jms.connection-check-interval]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.connection-check-interval[quarkus.pooled-jms.connection-check-interval]`
+
 
 [.description]
 --
@@ -93,6 +98,7 @@ endif::add-copy-button-to-env-var[]
 
 a| [[quarkus-pooled-jms_quarkus.pooled-jms.use-provider-jms-context]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.use-provider-jms-context[quarkus.pooled-jms.use-provider-jms-context]`
 
+
 [.description]
 --
 by default the JMS pool will use it's own generic JMSContext classes to wrap a Connection borrowed from the pool instead of using the JMSContext functionality of the JMS ConnectionFactory that was configured. This generic JMSContext implementation may be limited compared to the Provider version and if that functionality is critical to the application this option can be enabled to force the pool to use the Provider JMSContext implementation. When enabled the JMSContext API is then not part of the Connections that are pooled by this JMS Connection pooling library.
@@ -108,6 +114,7 @@ endif::add-copy-button-to-env-var[]
 
 
 a| [[quarkus-pooled-jms_quarkus.pooled-jms.max-sessions-per-connection]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.max-sessions-per-connection[quarkus.pooled-jms.max-sessions-per-connection]`
+
 
 [.description]
 --
@@ -125,6 +132,7 @@ endif::add-copy-button-to-env-var[]
 
 a| [[quarkus-pooled-jms_quarkus.pooled-jms.block-if-session-pool-is-full]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.block-if-session-pool-is-full[quarkus.pooled-jms.block-if-session-pool-is-full]`
 
+
 [.description]
 --
 When true (default) a call to createSession on a Connection from the pool will block until another previously created and loaned out session is closed an thereby becomes available. When false a call to createSession when no Session is available will throw an IllegalStateException to indicate that the Connection is not able to provide a new Session at that time.
@@ -141,6 +149,7 @@ endif::add-copy-button-to-env-var[]
 
 a| [[quarkus-pooled-jms_quarkus.pooled-jms.block-if-session-pool-is-full-timeout]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.block-if-session-pool-is-full-timeout[quarkus.pooled-jms.block-if-session-pool-is-full-timeout]`
 
+
 [.description]
 --
 When the blockIfSessionPoolIsFull option is enabled and this value is set then a call to createSession that has blocked awaiting a Session will wait for the specified number of milliseconds before throwing an IllegalStateException. By default this value is set to -1 indicating that the createSession call should block forever if configured to wait.
@@ -156,6 +165,7 @@ endif::add-copy-button-to-env-var[]
 
 
 a| [[quarkus-pooled-jms_quarkus.pooled-jms.use-anonymous-producers]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.use-anonymous-producers[quarkus.pooled-jms.use-anonymous-producers]`
+
 
 [.description]
 --
