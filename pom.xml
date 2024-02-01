@@ -21,7 +21,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.version>2.16.12.Final</quarkus.version>
-    <quarkus-artemis.version>2.1.2</quarkus-artemis.version>
+    <quarkus-artemis.version>2.1.3</quarkus-artemis.version>
     <pooled-jms.version>2.0.8</pooled-jms.version>
   </properties>
   <dependencyManagement>
