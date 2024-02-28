@@ -11,7 +11,7 @@ Quarkus extension for a JMS Connection pool and transaction manager integration 
 If you want to use this extension, you need to add the `io.quarkiverse.messaginghub:quarkus-pooled-jms` extension first.
 In your `pom.xml` file, add:
 
-[source,xml]
+[source,xml,subs="+attributes"]
 ----
 <dependency>
     <groupId>io.quarkiverse.messaginghub</groupId>
