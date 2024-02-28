@@ -1,4 +1,7 @@
 = Quarkus Messaginghub Pooled JMS
+
+include::./includes/attributes.adoc[]
+
 :extension-status: stable
 
 Quarkus extension for a JMS Connection pool and transaction manager integration for messaging applications supporting JMS 1.1 and 2.0 clients.
@@ -13,6 +16,7 @@ In your `pom.xml` file, add:
 <dependency>
     <groupId>io.quarkiverse.messaginghub</groupId>
     <artifactId>quarkus-pooled-jms</artifactId>
+    <version>{project-version}</version>
 </dependency>
 ----
 
@@ -101,4 +105,4 @@ It is different from the XA support. So if there is any issue happening during t
 [[extension-configuration-reference]]
 == Extension Configuration Reference
 
-include::config.adoc[leveloffset=+1, opts=optional]
+include::includes/quarkus-pooled-jms.adoc[leveloffset=+1, opts=optional]

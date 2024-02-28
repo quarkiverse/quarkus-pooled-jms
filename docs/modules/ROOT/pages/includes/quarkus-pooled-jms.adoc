@@ -10,7 +10,7 @@ h|[[quarkus-pooled-jms_configuration]]link:#quarkus-pooled-jms_configuration[Con
 h|Type
 h|Default
 
-a| [[quarkus-pooled-jms_quarkus.pooled-jms.pooling.enabled]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.pooling.enabled[quarkus.pooled-jms.pooling.enabled]`
+a| [[quarkus-pooled-jms_quarkus-pooled-jms-pooling-enabled]]`link:#quarkus-pooled-jms_quarkus-pooled-jms-pooling-enabled[quarkus.pooled-jms.pooling.enabled]`
 
 
 [.description]
@@ -27,7 +27,7 @@ endif::add-copy-button-to-env-var[]
 |`true`
 
 
-a| [[quarkus-pooled-jms_quarkus.pooled-jms.transaction]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.transaction[quarkus.pooled-jms.transaction]`
+a| [[quarkus-pooled-jms_quarkus-pooled-jms-transaction]]`link:#quarkus-pooled-jms_quarkus-pooled-jms-transaction[quarkus.pooled-jms.transaction]`
 
 
 [.description]
@@ -45,7 +45,7 @@ endif::add-copy-button-to-env-var[]
 |`disabled`
 
 
-a| [[quarkus-pooled-jms_quarkus.pooled-jms.max-connections]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.max-connections[quarkus.pooled-jms.max-connections]`
+a| [[quarkus-pooled-jms_quarkus-pooled-jms-max-connections]]`link:#quarkus-pooled-jms_quarkus-pooled-jms-max-connections[quarkus.pooled-jms.max-connections]`
 
 
 [.description]
@@ -62,7 +62,7 @@ endif::add-copy-button-to-env-var[]
 |`1`
 
 
-a| [[quarkus-pooled-jms_quarkus.pooled-jms.connection-idle-timeout]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.connection-idle-timeout[quarkus.pooled-jms.connection-idle-timeout]`
+a| [[quarkus-pooled-jms_quarkus-pooled-jms-connection-idle-timeout]]`link:#quarkus-pooled-jms_quarkus-pooled-jms-connection-idle-timeout[quarkus.pooled-jms.connection-idle-timeout]`
 
 
 [.description]
@@ -79,7 +79,7 @@ endif::add-copy-button-to-env-var[]
 |`30`
 
 
-a| [[quarkus-pooled-jms_quarkus.pooled-jms.connection-check-interval]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.connection-check-interval[quarkus.pooled-jms.connection-check-interval]`
+a| [[quarkus-pooled-jms_quarkus-pooled-jms-connection-check-interval]]`link:#quarkus-pooled-jms_quarkus-pooled-jms-connection-check-interval[quarkus.pooled-jms.connection-check-interval]`
 
 
 [.description]
@@ -96,7 +96,7 @@ endif::add-copy-button-to-env-var[]
 |`0`
 
 
-a| [[quarkus-pooled-jms_quarkus.pooled-jms.use-provider-jms-context]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.use-provider-jms-context[quarkus.pooled-jms.use-provider-jms-context]`
+a| [[quarkus-pooled-jms_quarkus-pooled-jms-use-provider-jms-context]]`link:#quarkus-pooled-jms_quarkus-pooled-jms-use-provider-jms-context[quarkus.pooled-jms.use-provider-jms-context]`
 
 
 [.description]
@@ -113,7 +113,7 @@ endif::add-copy-button-to-env-var[]
 |`false`
 
 
-a| [[quarkus-pooled-jms_quarkus.pooled-jms.max-sessions-per-connection]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.max-sessions-per-connection[quarkus.pooled-jms.max-sessions-per-connection]`
+a| [[quarkus-pooled-jms_quarkus-pooled-jms-max-sessions-per-connection]]`link:#quarkus-pooled-jms_quarkus-pooled-jms-max-sessions-per-connection[quarkus.pooled-jms.max-sessions-per-connection]`
 
 
 [.description]
@@ -130,7 +130,7 @@ endif::add-copy-button-to-env-var[]
 |`500`
 
 
-a| [[quarkus-pooled-jms_quarkus.pooled-jms.block-if-session-pool-is-full]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.block-if-session-pool-is-full[quarkus.pooled-jms.block-if-session-pool-is-full]`
+a| [[quarkus-pooled-jms_quarkus-pooled-jms-block-if-session-pool-is-full]]`link:#quarkus-pooled-jms_quarkus-pooled-jms-block-if-session-pool-is-full[quarkus.pooled-jms.block-if-session-pool-is-full]`
 
 
 [.description]
@@ -147,7 +147,7 @@ endif::add-copy-button-to-env-var[]
 |`true`
 
 
-a| [[quarkus-pooled-jms_quarkus.pooled-jms.block-if-session-pool-is-full-timeout]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.block-if-session-pool-is-full-timeout[quarkus.pooled-jms.block-if-session-pool-is-full-timeout]`
+a| [[quarkus-pooled-jms_quarkus-pooled-jms-block-if-session-pool-is-full-timeout]]`link:#quarkus-pooled-jms_quarkus-pooled-jms-block-if-session-pool-is-full-timeout[quarkus.pooled-jms.block-if-session-pool-is-full-timeout]`
 
 
 [.description]
@@ -164,7 +164,7 @@ endif::add-copy-button-to-env-var[]
 |`-1`
 
 
-a| [[quarkus-pooled-jms_quarkus.pooled-jms.use-anonymous-producers]]`link:#quarkus-pooled-jms_quarkus.pooled-jms.use-anonymous-producers[quarkus.pooled-jms.use-anonymous-producers]`
+a| [[quarkus-pooled-jms_quarkus-pooled-jms-use-anonymous-producers]]`link:#quarkus-pooled-jms_quarkus-pooled-jms-use-anonymous-producers[quarkus.pooled-jms.use-anonymous-producers]`
 
 
 [.description]
