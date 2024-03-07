@@ -29,7 +29,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.version>3.8.1</quarkus.version>
     <quarkus-artemis.version>3.2.0</quarkus-artemis.version>
-    <quarkus-qpid-jms.version>2.5.0</quarkus-qpid-jms.version>
+    <quarkus-qpid-jms.version>2.6.0</quarkus-qpid-jms.version>
     <pooled-jms.version>3.1.5</pooled-jms.version>
   </properties>
   <dependencyManagement>
