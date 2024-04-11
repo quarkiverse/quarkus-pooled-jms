@@ -18,7 +18,7 @@ updates:
     target-branch: "2.3.x"
     ignore:
       - dependency-name: "org.apache.maven.plugins:maven-compiler-plugin"
-      - dependency-name: "io.quarkus:quarkus-bom"
+      - dependency-name: "io.quarkus:*"
         versions: "[3.9,)"
       - dependency-name: "io.quarkiverse.artemis:quarkus-artemis-bom"
         versions: "[3.3,)"
@@ -29,7 +29,7 @@ updates:
     target-branch: "2.1.x"
     ignore:
       - dependency-name: "org.apache.maven.plugins:maven-compiler-plugin"
-      - dependency-name: "io.quarkus:quarkus-bom"
+      - dependency-name: "io.quarkus:*"
         versions: "[3.3,)"
       - dependency-name: "io.quarkiverse.artemis:quarkus-artemis-bom"
         versions: "[3.1,)"
@@ -42,7 +42,7 @@ updates:
       - dependency-name: "org.apache.maven.plugins:maven-compiler-plugin"
       - dependency-name: "org.messaginghub:pooled-jms"
         versions: "[3.0,)"
-      - dependency-name: "io.quarkus:quarkus-bom"
+      - dependency-name: "io.quarkus:*"
         versions: "[3.0,)"
       - dependency-name: "io.quarkiverse.artemis:quarkus-artemis-jms"
         versions: "[3.0,)"
