@@ -2,6 +2,8 @@ package io.quarkiverse.messaginghub.pooled.jms.transaction;
 
 import jakarta.jms.ConnectionFactory;
 
+import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
+
 import io.quarkiverse.messaginghub.pooled.jms.PooledJmsRuntimeConfig;
 
 public class LocalTransactionSupport {
@@ -14,7 +16,7 @@ public class LocalTransactionSupport {
         return true;
     }
 
-    public static ConnectionFactory getLocalTransactionConnectionFactory(ConnectionFactory connectionFactory,
+    public static JmsPoolConnectionFactory getLocalTransactionConnectionFactory(ConnectionFactory connectionFactory,
             PooledJmsRuntimeConfig pooledJmsRuntimeConfig) {
         return LocalTransactionSupportIndirect.getLocalTransactionConnectionFactory(connectionFactory, pooledJmsRuntimeConfig);
     }
