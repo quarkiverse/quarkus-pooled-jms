@@ -6,6 +6,7 @@ import jakarta.transaction.TransactionManager;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.jboss.narayana.jta.jms.JmsXAResourceRecoveryHelper;
 import org.jboss.tm.XAResourceRecoveryRegistry;
+import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 import org.messaginghub.pooled.jms.JmsPoolXAConnectionFactory;
 
 import io.quarkiverse.messaginghub.pooled.jms.PooledJmsRuntimeConfig;
@@ -17,7 +18,7 @@ import io.quarkus.arc.Arc;
  */
 public class XATransactionSupportIndirect {
 
-    public static ConnectionFactory getXAConnectionFactory(ConnectionFactory connectionFactory,
+    public static JmsPoolConnectionFactory getXAConnectionFactory(ConnectionFactory connectionFactory,
             PooledJmsRuntimeConfig pooledJmsRuntimeConfig) {
         TransactionManager transactionManager = Arc.container().instance(TransactionManager.class).get();
 
