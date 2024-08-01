@@ -44,6 +44,6 @@ updates:
         versions: "[3.0,)"
       - dependency-name: "io.quarkus:*"
         versions: "[3.0,)"
-      - dependency-name: "io.quarkiverse.artemis:quarkus-artemis-jms"
+      - dependency-name: "io.quarkiverse.artemis:quarkus-artemis-bom"
         versions: "[3.0,)"
 
