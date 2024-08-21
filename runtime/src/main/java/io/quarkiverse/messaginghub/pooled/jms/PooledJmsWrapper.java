@@ -22,11 +22,11 @@ public class PooledJmsWrapper {
     }
 
     public ConnectionFactory wrapConnectionFactory(ConnectionFactory connectionFactory) {
-        if (!pooledJmsRuntimeConfig.poolingEnabled) {
+        if (!pooledJmsRuntimeConfig.poolingEnabled()) {
             return connectionFactory;
         }
 
-        if (transaction && pooledJmsRuntimeConfig.transaction.equals(TransactionIntegration.XA)) {
+        if (transaction && pooledJmsRuntimeConfig.transaction().equals(TransactionIntegration.XA)) {
             if (XATransactionSupport.isEnabled()) {
                 JmsPoolConnectionFactory cf = XATransactionSupport.getXAConnectionFactory(connectionFactory,
                         pooledJmsRuntimeConfig);
@@ -35,7 +35,7 @@ public class PooledJmsWrapper {
             }
 
             throw new IllegalStateException("XA Transaction support is not available");
-        } else if (transaction && pooledJmsRuntimeConfig.transaction.equals(TransactionIntegration.ENABLED)) {
+        } else if (transaction && pooledJmsRuntimeConfig.transaction().equals(TransactionIntegration.ENABLED)) {
             if (LocalTransactionSupport.isEnabled()) {
                 JmsPoolConnectionFactory cf = LocalTransactionSupport.getLocalTransactionConnectionFactory(connectionFactory,
                         pooledJmsRuntimeConfig);
@@ -67,14 +67,14 @@ public class PooledJmsWrapper {
     public static void pooledJmsRuntimeConfigureConnectionFactory(JmsPoolConnectionFactory poolConnectionFactory,
             ConnectionFactory connectionFactory, PooledJmsRuntimeConfig pooledJmsRuntimeConfig) {
         poolConnectionFactory.setConnectionFactory(connectionFactory);
-        poolConnectionFactory.setMaxConnections(pooledJmsRuntimeConfig.maxConnections);
-        poolConnectionFactory.setConnectionIdleTimeout(pooledJmsRuntimeConfig.connectionIdleTimeout);
-        poolConnectionFactory.setConnectionCheckInterval(pooledJmsRuntimeConfig.connectionCheckInterval);
-        poolConnectionFactory.setUseProviderJMSContext(pooledJmsRuntimeConfig.useProviderJMSContext);
+        poolConnectionFactory.setMaxConnections(pooledJmsRuntimeConfig.maxConnections());
+        poolConnectionFactory.setConnectionIdleTimeout(pooledJmsRuntimeConfig.connectionIdleTimeout());
+        poolConnectionFactory.setConnectionCheckInterval(pooledJmsRuntimeConfig.connectionCheckInterval());
+        poolConnectionFactory.setUseProviderJMSContext(pooledJmsRuntimeConfig.useProviderJMSContext());
 
-        poolConnectionFactory.setMaxSessionsPerConnection(pooledJmsRuntimeConfig.maxSessionsPerConnection);
-        poolConnectionFactory.setBlockIfSessionPoolIsFull(pooledJmsRuntimeConfig.blockIfSessionPoolIsFull);
-        poolConnectionFactory.setBlockIfSessionPoolIsFullTimeout(pooledJmsRuntimeConfig.blockIfSessionPoolIsFullTimeout);
-        poolConnectionFactory.setUseAnonymousProducers(pooledJmsRuntimeConfig.useAnonymousProducers);
+        poolConnectionFactory.setMaxSessionsPerConnection(pooledJmsRuntimeConfig.maxSessionsPerConnection());
+        poolConnectionFactory.setBlockIfSessionPoolIsFull(pooledJmsRuntimeConfig.blockIfSessionPoolIsFull());
+        poolConnectionFactory.setBlockIfSessionPoolIsFullTimeout(pooledJmsRuntimeConfig.blockIfSessionPoolIsFullTimeout());
+        poolConnectionFactory.setUseAnonymousProducers(pooledJmsRuntimeConfig.useAnonymousProducers());
     }
 }
