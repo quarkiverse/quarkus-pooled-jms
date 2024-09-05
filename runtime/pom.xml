@@ -8,6 +8,7 @@
   </parent>
   <artifactId>quarkus-pooled-jms</artifactId>
   <name>Quarkus - Pooled Jms - Runtime</name>
+  <description>JMS connection pool and transaction integration for messaging applications supporting JMS 1.1 and 2.0 clients</description>
   <dependencies>
     <dependency>
       <groupId>io.quarkus</groupId>
