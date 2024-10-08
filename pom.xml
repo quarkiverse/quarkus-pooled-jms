@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.quarkiverse</groupId>
     <artifactId>quarkiverse-parent</artifactId>
-    <version>16</version>
+    <version>18</version>
   </parent>
   <groupId>io.quarkiverse.messaginghub</groupId>
   <artifactId>quarkus-pooled-jms-parent</artifactId>
@@ -23,6 +23,8 @@
     <quarkus.version>2.16.12.Final</quarkus.version>
     <quarkus-artemis.version>2.1.4</quarkus-artemis.version>
     <pooled-jms.version>2.0.9</pooled-jms.version>
+    <version.formatter.plugin>2.23.0</version.formatter.plugin>
+    <version.impsort.plugin>1.9.0</version.impsort.plugin>
   </properties>
   <dependencyManagement>
     <dependencies>
