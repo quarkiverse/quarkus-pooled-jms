@@ -21,7 +21,9 @@
     </dependencies>
   </dependencyManagement>
   <modules>
+    <!-- disable artemis due to https://github.com/quarkiverse/quarkus-artemis/issues/665
     <module>artemis-jms</module>
+    -->
     <module>qpid-jms</module>
   </modules>
 </project>
