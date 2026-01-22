@@ -2,6 +2,8 @@ package io.quarkiverse.messaginghub.pooled.jms.graal;
 
 import jakarta.jms.ConnectionFactory;
 
+import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
+
 import com.oracle.svm.core.annotate.Substitute;
 import com.oracle.svm.core.annotate.TargetClass;
 
@@ -22,7 +24,7 @@ final class Target_io_quarkiverse_messaginghub_pooled_jms_transaction_LocalTrans
     }
 
     @Substitute
-    public static ConnectionFactory getLocalTransactionConnectionFactory(ConnectionFactory connectionFactory,
+    public static JmsPoolConnectionFactory getLocalTransactionConnectionFactory(ConnectionFactory connectionFactory,
             PooledJmsRuntimeConfig pooledJmsRuntimeConfig) {
         throw new IllegalStateException("TransactionManager not present");
     }
@@ -40,7 +42,7 @@ final class Target_io_quarkiverse_messaginghub_pooled_jms_transaction_XATransact
     }
 
     @Substitute
-    public static ConnectionFactory getXAConnectionFactory(ConnectionFactory connectionFactory,
+    public static JmsPoolConnectionFactory getXAConnectionFactory(ConnectionFactory connectionFactory,
             PooledJmsRuntimeConfig pooledJmsRuntimeConfig) {
         throw new IllegalStateException("XAResourceRecoveryRegistry not present");
     }
