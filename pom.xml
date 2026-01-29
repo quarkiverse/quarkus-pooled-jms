@@ -26,7 +26,7 @@
     <maven.compiler.release>11</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <quarkus.version>3.31.0</quarkus.version>
+    <quarkus.version>3.31.1</quarkus.version>
     <quarkus-artemis.version>3.11.1</quarkus-artemis.version>
     <quarkus-qpid-jms.version>2.10.0</quarkus-qpid-jms.version>
     <pooled-jms.version>3.2.2</pooled-jms.version>
