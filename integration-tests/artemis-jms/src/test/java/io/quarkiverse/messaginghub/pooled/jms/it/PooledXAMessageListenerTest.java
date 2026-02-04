@@ -90,7 +90,6 @@ public class PooledXAMessageListenerTest {
             if (message != null) {
                 String body = message.getBody(String.class);
                 // Process message successfully
-                System.out.println("Successfully processed message: " + body);
             }
         }
     }
@@ -107,7 +106,6 @@ public class PooledXAMessageListenerTest {
             Message message = consumer.receive(5000L);
             if (message != null) {
                 String body = message.getBody(String.class);
-                System.out.println("Received message, throwing exception: " + body);
                 throw new RuntimeException("Simulated processing failure");
             }
         }

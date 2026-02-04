@@ -96,7 +96,8 @@ public class MyListener implements MessageListener {
         // This callback runs on a JMS provider thread
         // There is NO automatic transaction boundary here
         // Exceptions thrown here will NOT roll back XA transactions
-        throw new RuntimeException("Message not processed"); // Message will be lost!
+        throw new RuntimeException("Message not processed"); 
+        // With AUTO_ACKNOWLEDGE, the message is already acknowledged and will be lost
     }
 }
 ----
