@@ -2,6 +2,7 @@ package io.quarkiverse.messaginghub.pooled.jms.it;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
 
@@ -52,7 +53,7 @@ public class PooledXAMessageListenerTest {
             exceptionThrown = true;
         }
 
-        assertEquals(true, exceptionThrown, "Expected exception to be thrown");
+        assertTrue(exceptionThrown, "Expected exception to be thrown");
 
         // Message should still be available due to rollback
         String receivedBody = receiveMessage();
