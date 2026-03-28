@@ -55,8 +55,8 @@ class PooledJmsProcessor {
     @BuildStep
     @Record(ExecutionTime.RUNTIME_INIT)
     @Consume(ServiceStartBuildItem.class)
-    void reconfigureNamedConnectionFactories(PooledJmsRecorder recorder) {
-        recorder.reconfigureNamedConnectionFactories();
+    void reconfigureNamedConnectionFactories(Capabilities capabilities, PooledJmsRecorder recorder) {
+        recorder.reconfigureNamedConnectionFactories(capabilities.isPresent(Capability.TRANSACTIONS));
     }
 
     @BuildStep

@@ -21,6 +21,10 @@ public class PooledJmsWrapper {
         this.pooledJmsRuntimeConfig = pooledJmsRuntimeConfig;
     }
 
+    PooledJmsRuntimeConfig getPooledJmsRuntimeConfig() {
+        return pooledJmsRuntimeConfig;
+    }
+
     /**
      * Wrap the given connection factory using the default pool configuration.
      *
@@ -28,7 +32,7 @@ public class PooledJmsWrapper {
      * @return the wrapped (pooled) connection factory
      */
     public ConnectionFactory wrapConnectionFactory(ConnectionFactory connectionFactory) {
-        return wrapConnectionFactory(PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME, connectionFactory);
+        return doWrap(PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME, connectionFactory, true);
     }
 
     /**
@@ -40,33 +44,61 @@ public class PooledJmsWrapper {
      * @return the wrapped (pooled) connection factory
      */
     public ConnectionFactory wrapConnectionFactory(String name, ConnectionFactory connectionFactory) {
+        return doWrap(name, connectionFactory, false);
+    }
+
+    private ConnectionFactory doWrap(String name, ConnectionFactory connectionFactory, boolean delegating) {
         PooledJmsPoolConfig config = getConfigForName(name);
 
         if (!config.poolingEnabled()) {
             return connectionFactory;
         }
 
+        JmsPoolConnectionFactory cf;
         if (transaction && config.transaction().equals(TransactionIntegration.XA)) {
             if (XATransactionSupport.isEnabled()) {
-                JmsPoolConnectionFactory cf = XATransactionSupport.getXAConnectionFactory(connectionFactory, config);
-                poolConnectionFactories.add(cf);
-                return cf;
+                cf = XATransactionSupport.getXAConnectionFactory(connectionFactory, config);
+            } else {
+                throw new IllegalStateException("XA Transaction support is not available");
             }
+        } else if (transaction && config.transaction().equals(TransactionIntegration.ENABLED)) {
+            if (LocalTransactionSupport.isEnabled()) {
+                cf = LocalTransactionSupport.getLocalTransactionConnectionFactory(connectionFactory, config);
+            } else {
+                throw new IllegalStateException("Local TransactionManager support is not available");
+            }
+        } else {
+            cf = getConnectionFactory(connectionFactory, config);
+        }
 
+        if (delegating) {
+            DelegatingJmsPoolConnectionFactory wrapper = new DelegatingJmsPoolConnectionFactory(cf);
+            poolConnectionFactories.add(wrapper);
+            return wrapper;
+        }
+        poolConnectionFactories.add(cf);
+        return cf;
+    }
+
+    /**
+     * Create a new pool for the given connection factory using the named configuration.
+     * Used by the startup reconfigurer to re-wrap with the correct transaction type.
+     */
+    JmsPoolConnectionFactory createPool(String name, ConnectionFactory connectionFactory) {
+        PooledJmsPoolConfig config = getConfigForName(name);
+
+        if (transaction && config.transaction().equals(TransactionIntegration.XA)) {
+            if (XATransactionSupport.isEnabled()) {
+                return XATransactionSupport.getXAConnectionFactory(connectionFactory, config);
+            }
             throw new IllegalStateException("XA Transaction support is not available");
         } else if (transaction && config.transaction().equals(TransactionIntegration.ENABLED)) {
             if (LocalTransactionSupport.isEnabled()) {
-                JmsPoolConnectionFactory cf = LocalTransactionSupport.getLocalTransactionConnectionFactory(connectionFactory,
-                        config);
-                poolConnectionFactories.add(cf);
-                return cf;
+                return LocalTransactionSupport.getLocalTransactionConnectionFactory(connectionFactory, config);
             }
-
             throw new IllegalStateException("Local TransactionManager support is not available");
         } else {
-            JmsPoolConnectionFactory cf = getConnectionFactory(connectionFactory, config);
-            poolConnectionFactories.add(cf);
-            return cf;
+            return getConnectionFactory(connectionFactory, config);
         }
     }
 

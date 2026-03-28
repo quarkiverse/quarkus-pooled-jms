@@ -19,20 +19,21 @@ import io.smallrye.common.annotation.Identifier;
 /**
  * Reconfigures pooled JMS ConnectionFactory beans on startup based on their
  * {@link Identifier} qualifier. The SPI wrapper initially wraps all ConnectionFactories
- * with the default pool configuration. This reconfigurer then applies the correct
- * named configuration by inspecting each bean's CDI qualifiers.
+ * with the default pool configuration inside a {@link DelegatingJmsPoolConnectionFactory}.
+ * This reconfigurer then creates the correct pool (including the proper transaction type)
+ * for each named configuration and swaps the delegate.
  */
 public class PooledJmsNamedConfigReconfigurer {
     private static final Logger LOG = Logger.getLogger(PooledJmsNamedConfigReconfigurer.class);
 
-    private final PooledJmsRuntimeConfig pooledJmsRuntimeConfig;
+    private final PooledJmsWrapper wrapper;
 
-    public PooledJmsNamedConfigReconfigurer(PooledJmsRuntimeConfig pooledJmsRuntimeConfig) {
-        this.pooledJmsRuntimeConfig = pooledJmsRuntimeConfig;
+    public PooledJmsNamedConfigReconfigurer(PooledJmsWrapper wrapper) {
+        this.wrapper = wrapper;
     }
 
     public void reconfigure() {
-        Map<String, PooledJmsPoolConfig> configs = pooledJmsRuntimeConfig.connectionFactories();
+        Map<String, PooledJmsPoolConfig> configs = wrapper.getPooledJmsRuntimeConfig().connectionFactories();
 
         // Build set of explicitly configured named keys (excluding the default).
         // We cannot rely on configs.get() returning null for unconfigured names
@@ -54,18 +55,20 @@ public class PooledJmsNamedConfigReconfigurer {
                 continue;
             }
 
-            PooledJmsPoolConfig namedConfig = configs.get(name);
-
             ConnectionFactory cf = handle.get();
             // Unwrap CDI client proxy if present
             if (cf instanceof ClientProxy) {
                 cf = (ConnectionFactory) ClientProxy.unwrap(cf);
             }
 
-            if (cf instanceof JmsPoolConnectionFactory) {
-                JmsPoolConnectionFactory pool = (JmsPoolConnectionFactory) cf;
+            if (cf instanceof DelegatingJmsPoolConnectionFactory) {
+                DelegatingJmsPoolConnectionFactory delegating = (DelegatingJmsPoolConnectionFactory) cf;
+                // Get the inner (unwrapped) connection factory from the current pool
+                ConnectionFactory innerCf = (ConnectionFactory) delegating.getDelegate().getConnectionFactory();
+                // Create a new pool with the correct named config (including transaction type)
+                JmsPoolConnectionFactory newPool = wrapper.createPool(name, innerCf);
                 LOG.debugf("Reconfiguring pooled ConnectionFactory '%s' with named config", name);
-                applyConfig(pool, namedConfig);
+                delegating.replaceDelegate(newPool);
             }
         }
     }
@@ -77,16 +80,5 @@ public class PooledJmsNamedConfigReconfigurer {
             }
         }
         return null;
-    }
-
-    private static void applyConfig(JmsPoolConnectionFactory pool, PooledJmsPoolConfig config) {
-        pool.setMaxConnections(config.maxConnections());
-        pool.setConnectionIdleTimeout(config.connectionIdleTimeout());
-        pool.setConnectionCheckInterval(config.connectionCheckInterval());
-        pool.setUseProviderJMSContext(config.useProviderJMSContext());
-        pool.setMaxSessionsPerConnection(config.maxSessionsPerConnection());
-        pool.setBlockIfSessionPoolIsFull(config.blockIfSessionPoolIsFull());
-        pool.setBlockIfSessionPoolIsFullTimeout(config.blockIfSessionPoolIsFullTimeout());
-        pool.setUseAnonymousProducers(config.useAnonymousProducers());
     }
 }
