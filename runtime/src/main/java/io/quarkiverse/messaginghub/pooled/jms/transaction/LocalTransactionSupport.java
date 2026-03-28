@@ -4,7 +4,7 @@ import jakarta.jms.ConnectionFactory;
 
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 
-import io.quarkiverse.messaginghub.pooled.jms.PooledJmsRuntimeConfig;
+import io.quarkiverse.messaginghub.pooled.jms.PooledJmsPoolConfig;
 
 public class LocalTransactionSupport {
 
@@ -17,8 +17,8 @@ public class LocalTransactionSupport {
     }
 
     public static JmsPoolConnectionFactory getLocalTransactionConnectionFactory(ConnectionFactory connectionFactory,
-            PooledJmsRuntimeConfig pooledJmsRuntimeConfig) {
-        return LocalTransactionSupportIndirect.getLocalTransactionConnectionFactory(connectionFactory, pooledJmsRuntimeConfig);
+            PooledJmsPoolConfig config) {
+        return LocalTransactionSupportIndirect.getLocalTransactionConnectionFactory(connectionFactory, config);
     }
 
 }

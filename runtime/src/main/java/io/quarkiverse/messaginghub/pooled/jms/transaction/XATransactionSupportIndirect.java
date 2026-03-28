@@ -9,7 +9,7 @@ import org.jboss.tm.XAResourceRecoveryRegistry;
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 import org.messaginghub.pooled.jms.JmsPoolXAConnectionFactory;
 
-import io.quarkiverse.messaginghub.pooled.jms.PooledJmsRuntimeConfig;
+import io.quarkiverse.messaginghub.pooled.jms.PooledJmsPoolConfig;
 import io.quarkiverse.messaginghub.pooled.jms.PooledJmsWrapper;
 import io.quarkus.arc.Arc;
 
@@ -19,13 +19,13 @@ import io.quarkus.arc.Arc;
 public class XATransactionSupportIndirect {
 
     public static JmsPoolConnectionFactory getXAConnectionFactory(ConnectionFactory connectionFactory,
-            PooledJmsRuntimeConfig pooledJmsRuntimeConfig) {
+            PooledJmsPoolConfig config) {
         TransactionManager transactionManager = Arc.container().instance(TransactionManager.class).get();
 
         JmsPoolXAConnectionFactory xaConnectionFactory = new JmsPoolXAConnectionFactory();
         xaConnectionFactory.setTransactionManager(transactionManager);
         PooledJmsWrapper.pooledJmsRuntimeConfigureConnectionFactory(xaConnectionFactory, connectionFactory,
-                pooledJmsRuntimeConfig);
+                config);
 
         XAResourceRecoveryRegistry xaResourceRecoveryRegistry = Arc.container().instance(XAResourceRecoveryRegistry.class)
                 .get();
