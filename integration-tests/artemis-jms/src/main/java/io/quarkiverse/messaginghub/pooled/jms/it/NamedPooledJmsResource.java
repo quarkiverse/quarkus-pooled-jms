@@ -10,6 +10,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 
+import io.quarkiverse.messaginghub.pooled.jms.DelegatingJmsPoolConnectionFactory;
 import io.quarkus.arc.Arc;
 import io.quarkus.arc.ClientProxy;
 import io.quarkus.arc.InstanceHandle;
@@ -46,13 +47,24 @@ public class NamedPooledJmsResource {
         if (cf instanceof ClientProxy) {
             cf = (ConnectionFactory) ClientProxy.unwrap(cf);
         }
+        if (cf instanceof DelegatingJmsPoolConnectionFactory) {
+            DelegatingJmsPoolConnectionFactory delegating = (DelegatingJmsPoolConnectionFactory) cf;
+            JmsPoolConnectionFactory pool = delegating.getDelegate();
+            return String.format(
+                    "{\"maxConnections\":%d,\"maxSessionsPerConnection\":%d,\"useAnonymousProducers\":%b,\"poolType\":\"%s\"}",
+                    pool.getMaxConnections(),
+                    pool.getMaxSessionsPerConnection(),
+                    pool.isUseAnonymousProducers(),
+                    pool.getClass().getSimpleName());
+        }
         if (cf instanceof JmsPoolConnectionFactory) {
             JmsPoolConnectionFactory pool = (JmsPoolConnectionFactory) cf;
             return String.format(
-                    "{\"maxConnections\":%d,\"maxSessionsPerConnection\":%d,\"useAnonymousProducers\":%b}",
+                    "{\"maxConnections\":%d,\"maxSessionsPerConnection\":%d,\"useAnonymousProducers\":%b,\"poolType\":\"%s\"}",
                     pool.getMaxConnections(),
                     pool.getMaxSessionsPerConnection(),
-                    pool.isUseAnonymousProducers());
+                    pool.isUseAnonymousProducers(),
+                    pool.getClass().getSimpleName());
         }
         return "{\"pooled\":false}";
     }
