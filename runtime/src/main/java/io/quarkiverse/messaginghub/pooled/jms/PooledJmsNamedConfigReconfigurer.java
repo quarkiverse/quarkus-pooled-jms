@@ -1,6 +1,7 @@
 package io.quarkiverse.messaginghub.pooled.jms;
 
 import java.lang.annotation.Annotation;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,11 +34,12 @@ public class PooledJmsNamedConfigReconfigurer {
     public void reconfigure() {
         Map<String, PooledJmsPoolConfig> configs = pooledJmsRuntimeConfig.connectionFactories();
 
-        // Only reconfigure for names that have explicit pooled-jms configuration.
-        // Note: @WithDefaults causes configs.get() to return defaults for any key,
-        // so we must check keySet() to find explicitly configured names.
-        Set<String> configuredNames = configs.keySet();
-        if (configuredNames.size() <= 1) {
+        // Build set of explicitly configured named keys (excluding the default).
+        // We cannot rely on configs.get() returning null for unconfigured names
+        // because @WithDefaults causes it to return a defaults-initialized config for any key.
+        Set<String> namedKeys = new HashSet<>(configs.keySet());
+        namedKeys.remove(PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME);
+        if (namedKeys.isEmpty()) {
             return;
         }
 
@@ -47,7 +49,7 @@ public class PooledJmsNamedConfigReconfigurer {
                 continue;
             }
 
-            if (!configuredNames.contains(name)) {
+            if (!namedKeys.contains(name)) {
                 LOG.debugf("No pooled-jms config found for '%s', keeping default pool settings", name);
                 continue;
             }
