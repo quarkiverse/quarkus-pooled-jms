@@ -25,4 +25,8 @@ public class PooledJmsRecorder {
     public RuntimeValue<PooledJmsWrapper> getPooledJmsWrapper(boolean transaction) {
         return new RuntimeValue<>(new PooledJmsWrapper(transaction, pooledJmsRuntimeConfig.getValue()));
     }
+
+    public void reconfigureNamedConnectionFactories() {
+        new PooledJmsNamedConfigReconfigurer(pooledJmsRuntimeConfig.getValue()).reconfigure();
+    }
 }
