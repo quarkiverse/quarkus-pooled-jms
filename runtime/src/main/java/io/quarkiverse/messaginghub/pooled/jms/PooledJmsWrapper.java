@@ -1,16 +1,25 @@
 package io.quarkiverse.messaginghub.pooled.jms;
 
+import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import jakarta.jms.ConnectionFactory;
 
+import org.eclipse.microprofile.config.ConfigProvider;
+import org.jboss.logging.Logger;
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 
 import io.quarkiverse.messaginghub.pooled.jms.transaction.LocalTransactionSupport;
 import io.quarkiverse.messaginghub.pooled.jms.transaction.XATransactionSupport;
 
 public class PooledJmsWrapper {
+    private static final Logger LOG = Logger.getLogger(PooledJmsWrapper.class);
+
     private boolean transaction;
     private PooledJmsRuntimeConfig pooledJmsRuntimeConfig;
 
@@ -22,13 +31,16 @@ public class PooledJmsWrapper {
     }
 
     /**
-     * Wrap the given connection factory using the default pool configuration.
+     * Wrap the given connection factory, automatically resolving the pool configuration name
+     * by matching the connection factory's URL against known artemis configuration URLs.
+     * Falls back to the default pool configuration if no match is found.
      *
      * @param connectionFactory the connection factory to wrap
      * @return the wrapped (pooled) connection factory
      */
     public ConnectionFactory wrapConnectionFactory(ConnectionFactory connectionFactory) {
-        return wrapConnectionFactory(PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME, connectionFactory);
+        String name = resolveConnectionFactoryName(connectionFactory);
+        return wrapConnectionFactory(name, connectionFactory);
     }
 
     /**
@@ -100,5 +112,70 @@ public class PooledJmsWrapper {
         poolConnectionFactory.setBlockIfSessionPoolIsFull(config.blockIfSessionPoolIsFull());
         poolConnectionFactory.setBlockIfSessionPoolIsFullTimeout(config.blockIfSessionPoolIsFullTimeout());
         poolConnectionFactory.setUseAnonymousProducers(config.useAnonymousProducers());
+    }
+
+    /**
+     * Resolves the pooled-jms configuration name for a given ConnectionFactory by matching
+     * its URL against the artemis configuration URLs.
+     * Falls back to the default configuration if no match is found.
+     */
+    private String resolveConnectionFactoryName(ConnectionFactory cf) {
+        Map<String, PooledJmsPoolConfig> configs = pooledJmsRuntimeConfig.connectionFactories();
+
+        // If there are no named configs (only default), skip URL matching
+        Set<String> namedKeys = configs.keySet();
+        if (namedKeys.size() <= 1) {
+            return PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME;
+        }
+
+        // Try to get the URL from the ConnectionFactory via reflection
+        String cfUrl = getConnectionFactoryUrl(cf);
+        if (cfUrl == null) {
+            return PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME;
+        }
+
+        // Match against artemis config URLs for each named key
+        var mpConfig = ConfigProvider.getConfig();
+        for (String name : namedKeys) {
+            if (PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME.equals(name)) {
+                continue;
+            }
+            try {
+                // Try reading the artemis URL for this named config
+                String artemisUrl = mpConfig.getValue("quarkus.artemis.\"" + name + "\".url", String.class);
+                if (urlsMatch(cfUrl, artemisUrl)) {
+                    LOG.debugf("Matched ConnectionFactory URL to pooled-jms config name '%s'", name);
+                    return name;
+                }
+            } catch (NoSuchElementException e) {
+                // No artemis URL configured for this name, skip
+            }
+        }
+
+        return PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME;
+    }
+
+    /**
+     * Extracts the broker URL from a ConnectionFactory using reflection.
+     * This avoids a hard compile-time dependency on ActiveMQConnectionFactory.
+     */
+    private static String getConnectionFactoryUrl(ConnectionFactory cf) {
+        try {
+            Method toUriMethod = cf.getClass().getMethod("toURI");
+            URI uri = (URI) toUriMethod.invoke(cf);
+            return uri.toString();
+        } catch (Exception e) {
+            LOG.debugf("Unable to extract URL from ConnectionFactory: %s", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Checks if a ConnectionFactory URI matches an artemis config URL.
+     * The CF URI (from toURI()) may contain additional parameters, so we check
+     * if the artemis URL appears within the CF URI.
+     */
+    private static boolean urlsMatch(String cfUri, String artemisUrl) {
+        return cfUri.contains(artemisUrl) || artemisUrl.contains(cfUri);
     }
 }

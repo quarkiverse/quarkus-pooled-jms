@@ -15,7 +15,7 @@ public class PooledNamedConfigTest {
     @Test
     public void testDefaultPoolConfig() {
         given()
-                .when().get("/named-pooled-jms/default-info")
+                .when().get("/named-pooled-jms/info/default")
                 .then()
                 .statusCode(200)
                 .body("maxConnections", is(5))
@@ -26,11 +26,24 @@ public class PooledNamedConfigTest {
     @Test
     public void testNamedPoolConfig() {
         given()
-                .when().get("/named-pooled-jms/named-info")
+                .when().get("/named-pooled-jms/info/broker1")
                 .then()
                 .statusCode(200)
                 .body("maxConnections", is(15))
                 .body("maxSessionsPerConnection", is(300))
                 .body("useAnonymousProducers", is(false));
+    }
+
+    @Test
+    public void testFallbackToDefaultPoolConfig() {
+        // "broker2" has an artemis config but no pooled-jms config,
+        // so it should fall back to the default pool settings
+        given()
+                .when().get("/named-pooled-jms/info/broker2")
+                .then()
+                .statusCode(200)
+                .body("maxConnections", is(5))
+                .body("maxSessionsPerConnection", is(100))
+                .body("useAnonymousProducers", is(true));
     }
 }
