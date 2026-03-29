@@ -30,11 +30,11 @@ public class PooledJmsRecorder {
         return new RuntimeValue<>(new PooledJmsWrapper(transaction, pooledJmsRuntimeConfig.getValue()));
     }
 
-    public void reconfigureNamedConnectionFactories(boolean transaction) {
+    public void initializeConnectionFactories(boolean transaction) {
         PooledJmsWrapper wrapper = spiWrapper;
         if (wrapper == null) {
             wrapper = new PooledJmsWrapper(transaction, pooledJmsRuntimeConfig.getValue());
         }
-        new PooledJmsNamedConfigReconfigurer(wrapper).reconfigure();
+        new PooledJmsConnectionFactoryInitializer(wrapper).initialize();
     }
 }

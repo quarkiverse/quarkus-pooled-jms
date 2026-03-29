@@ -26,63 +26,22 @@ public class PooledJmsWrapper {
     }
 
     /**
-     * Wrap the given connection factory using the default pool configuration.
+     * Wrap the given connection factory in a {@link DelegatingJmsPoolConnectionFactory}
+     * that defers pool creation to the startup phase. The actual pool (with the correct
+     * transaction type and named configuration) is created later by
+     * {@link PooledJmsConnectionFactoryInitializer}.
      *
      * @param connectionFactory the connection factory to wrap
-     * @return the wrapped (pooled) connection factory
+     * @return the wrapped (delegating) connection factory
      */
     public ConnectionFactory wrapConnectionFactory(ConnectionFactory connectionFactory) {
-        return doWrap(PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME, connectionFactory, true);
-    }
-
-    /**
-     * Wrap the given connection factory using the named pool configuration.
-     * If no configuration is found for the given name, the default configuration is used.
-     *
-     * @param name the configuration name (e.g. the connection factory identifier)
-     * @param connectionFactory the connection factory to wrap
-     * @return the wrapped (pooled) connection factory
-     */
-    public ConnectionFactory wrapConnectionFactory(String name, ConnectionFactory connectionFactory) {
-        return doWrap(name, connectionFactory, false);
-    }
-
-    private ConnectionFactory doWrap(String name, ConnectionFactory connectionFactory, boolean delegating) {
-        PooledJmsPoolConfig config = getConfigForName(name);
-
-        if (!config.poolingEnabled()) {
-            return connectionFactory;
-        }
-
-        JmsPoolConnectionFactory cf;
-        if (transaction && config.transaction().equals(TransactionIntegration.XA)) {
-            if (XATransactionSupport.isEnabled()) {
-                cf = XATransactionSupport.getXAConnectionFactory(connectionFactory, config);
-            } else {
-                throw new IllegalStateException("XA Transaction support is not available");
-            }
-        } else if (transaction && config.transaction().equals(TransactionIntegration.ENABLED)) {
-            if (LocalTransactionSupport.isEnabled()) {
-                cf = LocalTransactionSupport.getLocalTransactionConnectionFactory(connectionFactory, config);
-            } else {
-                throw new IllegalStateException("Local TransactionManager support is not available");
-            }
-        } else {
-            cf = getConnectionFactory(connectionFactory, config);
-        }
-
-        if (delegating) {
-            DelegatingJmsPoolConnectionFactory wrapper = new DelegatingJmsPoolConnectionFactory(cf);
-            poolConnectionFactories.add(wrapper);
-            return wrapper;
-        }
-        poolConnectionFactories.add(cf);
-        return cf;
+        DelegatingJmsPoolConnectionFactory delegating = new DelegatingJmsPoolConnectionFactory(connectionFactory);
+        poolConnectionFactories.add(delegating);
+        return delegating;
     }
 
     /**
      * Create a new pool for the given connection factory using the named configuration.
-     * Used by the startup reconfigurer to re-wrap with the correct transaction type.
      */
     JmsPoolConnectionFactory createPool(String name, ConnectionFactory connectionFactory) {
         PooledJmsPoolConfig config = getConfigForName(name);
