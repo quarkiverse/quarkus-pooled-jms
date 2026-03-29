@@ -18,6 +18,10 @@
       <artifactId>quarkus-narayana-jta</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-health</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.quarkiverse.artemis</groupId>
       <artifactId>quarkus-artemis-jms</artifactId>
     </dependency>

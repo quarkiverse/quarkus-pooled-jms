@@ -8,11 +8,6 @@ import io.quarkus.test.junit.QuarkusTestProfile;
 public class JmsNamedXAConfigTestProfile implements QuarkusTestProfile {
 
     @Override
-    public String getConfigProfile() {
-        return "named-xa-config";
-    }
-
-    @Override
     public Map<String, String> getConfigOverrides() {
         HashMap<String, String> props = new HashMap<>();
 
