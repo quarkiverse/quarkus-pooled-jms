@@ -21,6 +21,7 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     private volatile JmsPoolConnectionFactory delegate;
     private final ConnectionFactory wrappedConnectionFactory;
+    private volatile boolean passthrough;
 
     public DelegatingJmsPoolConnectionFactory(ConnectionFactory wrappedConnectionFactory) {
         this.wrappedConnectionFactory = wrappedConnectionFactory;
@@ -28,6 +29,18 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     public void setDelegate(JmsPoolConnectionFactory delegate) {
         this.delegate = delegate;
+    }
+
+    /**
+     * Enable passthrough mode. In this mode, connection and context creation
+     * methods delegate directly to the raw {@link ConnectionFactory} without pooling.
+     */
+    public void setPassthrough() {
+        this.passthrough = true;
+    }
+
+    public boolean isPassthrough() {
+        return passthrough;
     }
 
     public JmsPoolConnectionFactory getDelegate() {
@@ -46,35 +59,55 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
         return d;
     }
 
-    // --- Connection creation (delegates to the actual pool) ---
+    // --- Connection creation ---
 
     @Override
     public Connection createConnection() throws JMSException {
+        if (passthrough) {
+            return wrappedConnectionFactory.createConnection();
+        }
         return delegate().createConnection();
     }
 
     @Override
     public Connection createConnection(String userName, String password) throws JMSException {
+        if (passthrough) {
+            return wrappedConnectionFactory.createConnection(userName, password);
+        }
         return delegate().createConnection(userName, password);
     }
 
     @Override
     public QueueConnection createQueueConnection() throws JMSException {
+        if (passthrough) {
+            return ((jakarta.jms.QueueConnectionFactory) wrappedConnectionFactory).createQueueConnection();
+        }
         return delegate().createQueueConnection();
     }
 
     @Override
     public QueueConnection createQueueConnection(String userName, String password) throws JMSException {
+        if (passthrough) {
+            return ((jakarta.jms.QueueConnectionFactory) wrappedConnectionFactory).createQueueConnection(userName,
+                    password);
+        }
         return delegate().createQueueConnection(userName, password);
     }
 
     @Override
     public TopicConnection createTopicConnection() throws JMSException {
+        if (passthrough) {
+            return ((jakarta.jms.TopicConnectionFactory) wrappedConnectionFactory).createTopicConnection();
+        }
         return delegate().createTopicConnection();
     }
 
     @Override
     public TopicConnection createTopicConnection(String userName, String password) throws JMSException {
+        if (passthrough) {
+            return ((jakarta.jms.TopicConnectionFactory) wrappedConnectionFactory).createTopicConnection(userName,
+                    password);
+        }
         return delegate().createTopicConnection(userName, password);
     }
 
@@ -82,21 +115,33 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     @Override
     public JMSContext createContext() {
+        if (passthrough) {
+            return wrappedConnectionFactory.createContext();
+        }
         return delegate().createContext();
     }
 
     @Override
     public JMSContext createContext(int sessionMode) {
+        if (passthrough) {
+            return wrappedConnectionFactory.createContext(sessionMode);
+        }
         return delegate().createContext(sessionMode);
     }
 
     @Override
     public JMSContext createContext(String userName, String password) {
+        if (passthrough) {
+            return wrappedConnectionFactory.createContext(userName, password);
+        }
         return delegate().createContext(userName, password);
     }
 
     @Override
     public JMSContext createContext(String userName, String password, int sessionMode) {
+        if (passthrough) {
+            return wrappedConnectionFactory.createContext(userName, password, sessionMode);
+        }
         return delegate().createContext(userName, password, sessionMode);
     }
 
@@ -104,28 +149,39 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     @Override
     public void start() {
-        delegate().start();
+        if (!passthrough) {
+            delegate().start();
+        }
     }
 
     @Override
     public void stop() {
-        delegate().stop();
+        if (!passthrough) {
+            delegate().stop();
+        }
     }
 
     @Override
     public void clear() {
-        delegate().clear();
+        if (!passthrough) {
+            delegate().clear();
+        }
     }
 
     @Override
     public void initConnectionsPool() {
-        delegate().initConnectionsPool();
+        if (!passthrough) {
+            delegate().initConnectionsPool();
+        }
     }
 
     // --- Configuration getters (delegate to the actual pool) ---
 
     @Override
     public Object getConnectionFactory() {
+        if (passthrough) {
+            return wrappedConnectionFactory;
+        }
         return delegate().getConnectionFactory();
     }
 

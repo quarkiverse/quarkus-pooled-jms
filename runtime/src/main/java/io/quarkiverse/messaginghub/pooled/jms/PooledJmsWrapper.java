@@ -1,7 +1,9 @@
 package io.quarkiverse.messaginghub.pooled.jms;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.jms.ConnectionFactory;
 
@@ -38,6 +40,24 @@ public class PooledJmsWrapper {
         DelegatingJmsPoolConnectionFactory delegating = new DelegatingJmsPoolConnectionFactory(connectionFactory);
         poolConnectionFactories.add(delegating);
         return delegating;
+    }
+
+    /**
+     * Return the set of explicitly configured connection factory names
+     * (excluding the default). Names not in this set should fall back
+     * to the default configuration.
+     */
+    Set<String> getExplicitlyConfiguredNames() {
+        Set<String> names = new HashSet<>(pooledJmsRuntimeConfig.connectionFactories().keySet());
+        names.remove(PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME);
+        return names;
+    }
+
+    /**
+     * Check whether pooling is enabled for the given configuration name.
+     */
+    boolean isPoolingEnabled(String name) {
+        return getConfigForName(name).poolingEnabled();
     }
 
     /**

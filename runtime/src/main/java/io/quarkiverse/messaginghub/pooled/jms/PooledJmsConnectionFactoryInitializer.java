@@ -1,6 +1,7 @@
 package io.quarkiverse.messaginghub.pooled.jms;
 
 import java.lang.annotation.Annotation;
+import java.util.Set;
 
 import jakarta.jms.ConnectionFactory;
 
@@ -30,6 +31,8 @@ public class PooledJmsConnectionFactoryInitializer {
     }
 
     public void initialize() {
+        Set<String> configuredNames = wrapper.getExplicitlyConfiguredNames();
+
         for (InstanceHandle<ConnectionFactory> handle : Arc.container().listAll(ConnectionFactory.class)) {
             ConnectionFactory cf = handle.get();
             // Unwrap CDI client proxy if present
@@ -39,15 +42,28 @@ public class PooledJmsConnectionFactoryInitializer {
 
             if (cf instanceof DelegatingJmsPoolConnectionFactory) {
                 DelegatingJmsPoolConnectionFactory delegating = (DelegatingJmsPoolConnectionFactory) cf;
-                String name = extractIdentifierName(handle.getBean());
-                if (name == null) {
-                    name = PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME;
+                String identifierName = extractIdentifierName(handle.getBean());
+
+                // Resolve the config name: use the identifier if it has explicit config,
+                // otherwise fall back to the default config.
+                String configName;
+                if (identifierName == null || !configuredNames.contains(identifierName)) {
+                    configName = PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME;
+                } else {
+                    configName = identifierName;
                 }
 
                 ConnectionFactory rawCf = delegating.getWrappedConnectionFactory();
-                JmsPoolConnectionFactory pool = wrapper.createPool(name, rawCf);
-                LOG.debugf("Initializing pooled ConnectionFactory '%s' with pool type %s", name,
-                        pool.getClass().getSimpleName());
+                if (!wrapper.isPoolingEnabled(configName)) {
+                    LOG.debugf("Pooling disabled for ConnectionFactory '%s', using passthrough",
+                            identifierName != null ? identifierName : "default");
+                    delegating.setPassthrough();
+                    continue;
+                }
+                JmsPoolConnectionFactory pool = wrapper.createPool(configName, rawCf);
+                LOG.debugf("Initializing pooled ConnectionFactory '%s' with config '%s', pool type %s",
+                        identifierName != null ? identifierName : "default",
+                        configName, pool.getClass().getSimpleName());
                 delegating.setDelegate(pool);
             }
         }

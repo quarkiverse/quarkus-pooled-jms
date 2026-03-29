@@ -49,6 +49,9 @@ public class NamedPooledJmsResource {
         }
         if (cf instanceof DelegatingJmsPoolConnectionFactory) {
             DelegatingJmsPoolConnectionFactory delegating = (DelegatingJmsPoolConnectionFactory) cf;
+            if (delegating.isPassthrough()) {
+                return "{\"pooled\":false}";
+            }
             JmsPoolConnectionFactory pool = delegating.getDelegate();
             return String.format(
                     "{\"maxConnections\":%d,\"maxSessionsPerConnection\":%d,\"useAnonymousProducers\":%b,\"poolType\":\"%s\"}",

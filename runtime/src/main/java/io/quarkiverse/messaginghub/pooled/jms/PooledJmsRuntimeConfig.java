@@ -20,8 +20,8 @@ public interface PooledJmsRuntimeConfig {
      * Pool configurations per connection factory name.
      * The default (unnamed) configuration applies to the default connection factory
      * and is also used as fallback when a named configuration is not found.
-     * Named configurations are used with
-     * {@link PooledJmsWrapper#wrapConnectionFactory(String, jakarta.jms.ConnectionFactory)}.
+     * Named configurations are matched to ConnectionFactory beans by their
+     * {@link io.smallrye.common.annotation.Identifier} qualifier at startup.
      */
     @WithParentName
     @WithDefaults
