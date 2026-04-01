@@ -22,6 +22,7 @@
   </dependencyManagement>
   <modules>
     <module>artemis-jms</module>
+    <module>ibmmq</module>
     <module>qpid-jms</module>
   </modules>
 </project>
