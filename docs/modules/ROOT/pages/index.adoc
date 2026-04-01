@@ -236,6 +236,88 @@ protected void send(String body, ConnectionFactory factory, String queueName) {
 It is different from the XA support. So if there is any issue happening during the session committing, the transaction will not be rollbacked.
 ====
 
+== Named Connection Factory Configuration
+
+When using multiple connection factories (e.g. with `quarkus-artemis-jms` named configurations), you can configure pool settings independently for each one.
+
+=== Basic Named Configuration
+
+Define named artemis connections in your `application.properties`, then configure their pool settings separately:
+
+[source,properties]
+----
+# Artemis named connections
+quarkus.artemis."orders".devservices.enabled=true
+quarkus.artemis."inventory".devservices.enabled=true
+
+# Default pool settings (apply to the default and any unconfigured named connection)
+quarkus.pooled-jms.max-connections=5
+quarkus.pooled-jms.max-sessions-per-connection=100
+
+# Named pool settings for "orders"
+quarkus.pooled-jms."orders".max-connections=20
+quarkus.pooled-jms."orders".max-sessions-per-connection=500
+quarkus.pooled-jms."orders".use-anonymous-producers=false
+----
+
+In this example:
+
+* The default connection factory uses `max-connections=5`
+* The `orders` connection factory uses `max-connections=20`
+* The `inventory` connection factory has no explicit pool config, so it falls back to the default settings (`max-connections=5`)
+
+=== Mixed Transaction Types
+
+Each named connection factory can use a different transaction type:
+
+[source,properties]
+----
+# Default uses local transaction
+quarkus.pooled-jms.transaction=enabled
+
+# "orders" uses XA transaction
+quarkus.pooled-jms."orders".transaction=xa
+
+# "inventory" has no explicit config, inherits default (local transaction)
+----
+
+[NOTE]
+====
+XA transaction support requires the `quarkus-narayana-jta` extension and `quarkus.transaction-manager.enable-recovery=true`. See the <<XA transaction support>> section for details.
+====
+
+=== Disabling Pooling for Specific Connections
+
+You can disable pooling for individual connection factories. When pooling is disabled, the connection factory passes through directly to the underlying provider without any pooling:
+
+[source,properties]
+----
+# Default pool is enabled
+quarkus.pooled-jms.max-connections=5
+
+# Disable pooling for "admin" connection
+quarkus.pooled-jms."admin".pooling.enabled=false
+----
+
+You can also disable the default pool while keeping named pools enabled:
+
+[source,properties]
+----
+# Default pool is disabled
+quarkus.pooled-jms.pooling.enabled=false
+
+# "orders" pool is explicitly enabled with custom settings
+quarkus.pooled-jms."orders".max-connections=10
+----
+
+=== How It Works
+
+The pooled-jms extension integrates with the JMS SPI to wrap all `ConnectionFactory` beans automatically. Pool creation is deferred to the application startup phase:
+
+1. During build time, the SPI wrapper wraps each `ConnectionFactory` in a `DelegatingJmsPoolConnectionFactory` without creating any pool yet.
+2. At startup, the initializer inspects each `ConnectionFactory` CDI bean, determines its name from the `@Identifier` qualifier, and creates the correct pool (with the proper configuration and transaction type).
+3. Named connections with explicit pool configuration use their own settings. Unconfigured named connections fall back to the default pool configuration.
+
 [[extension-configuration-reference]]
 == Extension Configuration Reference
 

@@ -1,7 +1,9 @@
 package io.quarkiverse.messaginghub.pooled.jms;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.jms.ConnectionFactory;
 
@@ -21,52 +23,61 @@ public class PooledJmsWrapper {
         this.pooledJmsRuntimeConfig = pooledJmsRuntimeConfig;
     }
 
-    /**
-     * Wrap the given connection factory using the default pool configuration.
-     *
-     * @param connectionFactory the connection factory to wrap
-     * @return the wrapped (pooled) connection factory
-     */
-    public ConnectionFactory wrapConnectionFactory(ConnectionFactory connectionFactory) {
-        return wrapConnectionFactory(PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME, connectionFactory);
+    PooledJmsRuntimeConfig getPooledJmsRuntimeConfig() {
+        return pooledJmsRuntimeConfig;
     }
 
     /**
-     * Wrap the given connection factory using the named pool configuration.
-     * If no configuration is found for the given name, the default configuration is used.
+     * Wrap the given connection factory in a {@link DelegatingJmsPoolConnectionFactory}
+     * that defers pool creation to the startup phase. The actual pool (with the correct
+     * transaction type and named configuration) is created later by
+     * {@link PooledJmsConnectionFactoryInitializer}.
      *
-     * @param name the configuration name (e.g. the connection factory identifier)
      * @param connectionFactory the connection factory to wrap
-     * @return the wrapped (pooled) connection factory
+     * @return the wrapped (delegating) connection factory
      */
-    public ConnectionFactory wrapConnectionFactory(String name, ConnectionFactory connectionFactory) {
-        PooledJmsPoolConfig config = getConfigForName(name);
+    public ConnectionFactory wrapConnectionFactory(ConnectionFactory connectionFactory) {
+        DelegatingJmsPoolConnectionFactory delegating = new DelegatingJmsPoolConnectionFactory(connectionFactory);
+        poolConnectionFactories.add(delegating);
+        return delegating;
+    }
 
-        if (!config.poolingEnabled()) {
-            return connectionFactory;
-        }
+    /**
+     * Return the set of explicitly configured connection factory names
+     * (excluding the default). Names not in this set should fall back
+     * to the default configuration.
+     */
+    Set<String> getExplicitlyConfiguredNames() {
+        Set<String> names = new HashSet<>(pooledJmsRuntimeConfig.connectionFactories().keySet());
+        names.remove(PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME);
+        return names;
+    }
+
+    /**
+     * Check whether pooling is enabled for the given configuration name.
+     */
+    boolean isPoolingEnabled(String name) {
+        return getConfigForName(name).poolingEnabled();
+    }
+
+    /**
+     * Create a new pool for the given connection factory using the named configuration.
+     */
+    JmsPoolConnectionFactory createPool(String name, ConnectionFactory connectionFactory) {
+        PooledJmsPoolConfig config = getConfigForName(name);
 
         if (transaction && config.transaction().equals(TransactionIntegration.XA)) {
             if (XATransactionSupport.isEnabled()) {
-                JmsPoolConnectionFactory cf = XATransactionSupport.getXAConnectionFactory(connectionFactory, config);
-                poolConnectionFactories.add(cf);
-                return cf;
+                return XATransactionSupport.getXAConnectionFactory(connectionFactory, config);
             }
-
             throw new IllegalStateException("XA Transaction support is not available");
         } else if (transaction && config.transaction().equals(TransactionIntegration.ENABLED)) {
             if (LocalTransactionSupport.isEnabled()) {
-                JmsPoolConnectionFactory cf = LocalTransactionSupport.getLocalTransactionConnectionFactory(connectionFactory,
-                        config);
-                poolConnectionFactories.add(cf);
-                return cf;
+                return LocalTransactionSupport.getLocalTransactionConnectionFactory(connectionFactory, config);
             }
-
             throw new IllegalStateException("Local TransactionManager support is not available");
         } else {
-            JmsPoolConnectionFactory cf = getConnectionFactory(connectionFactory, config);
-            poolConnectionFactories.add(cf);
-            return cf;
+            return getConnectionFactory(connectionFactory, config);
         }
     }
 

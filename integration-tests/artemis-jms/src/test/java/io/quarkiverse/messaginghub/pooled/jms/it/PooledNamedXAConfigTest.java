@@ -9,43 +9,41 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 
 @QuarkusTest
-@TestProfile(JmsNamedConfigTestProfile.class)
-public class PooledNamedConfigTest {
+@TestProfile(JmsNamedXAConfigTestProfile.class)
+public class PooledNamedXAConfigTest {
 
     @Test
-    public void testDefaultPoolConfig() {
+    public void testDefaultPoolUsesLocalTransaction() {
         given()
                 .when().get("/named-pooled-jms/info/default")
                 .then()
                 .statusCode(200)
                 .body("maxConnections", is(5))
                 .body("maxSessionsPerConnection", is(100))
-                .body("useAnonymousProducers", is(true))
                 .body("poolType", is("JmsPoolLocalTransactionConnectionFactory"));
     }
 
     @Test
-    public void testNamedPoolConfig() {
+    public void testNamedPoolUsesXA() {
         given()
                 .when().get("/named-pooled-jms/info/broker1")
                 .then()
                 .statusCode(200)
-                .body("maxConnections", is(15))
-                .body("maxSessionsPerConnection", is(300))
-                .body("useAnonymousProducers", is(false))
-                .body("poolType", is("JmsPoolConnectionFactory"));
+                .body("maxConnections", is(10))
+                .body("maxSessionsPerConnection", is(200))
+                .body("poolType", is("JmsPoolXAConnectionFactory"));
     }
 
     @Test
-    public void testFallbackToDefaultPoolConfig() {
-        // "broker2" has an artemis config but no pooled-jms config,
-        // so it should fall back to the default pool settings
+    public void testUnconfiguredNamedPoolFallsBackToDefault() {
+        // "broker2" has artemis config but no pooled-jms config,
+        // so it should use the default pool settings (local transaction)
         given()
                 .when().get("/named-pooled-jms/info/broker2")
                 .then()
                 .statusCode(200)
                 .body("maxConnections", is(5))
                 .body("maxSessionsPerConnection", is(100))
-                .body("useAnonymousProducers", is(true));
+                .body("poolType", is("JmsPoolLocalTransactionConnectionFactory"));
     }
 }

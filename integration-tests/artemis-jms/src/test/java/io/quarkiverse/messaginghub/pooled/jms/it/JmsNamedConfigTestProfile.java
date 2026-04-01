@@ -6,6 +6,7 @@ import java.util.Map;
 import io.quarkus.test.junit.QuarkusTestProfile;
 
 public class JmsNamedConfigTestProfile implements QuarkusTestProfile {
+
     @Override
     public Map<String, String> getConfigOverrides() {
         HashMap<String, String> props = new HashMap<>();
