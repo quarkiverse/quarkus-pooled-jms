@@ -7,6 +7,7 @@ import jakarta.jms.JMSException;
 import jakarta.jms.QueueConnection;
 import jakarta.jms.TopicConnection;
 
+import org.jboss.logging.Logger;
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 
 /**
@@ -15,16 +16,27 @@ import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
  * without creating any pool. At startup, the correct pool (including the proper transaction type)
  * is created and set as the delegate.
  * <p>
+ * If the delegate has not been set by the initializer (e.g. for {@code @Dependent}-scoped
+ * producer beans), lazy initialization is performed on first use using the default pool config.
+ * <p>
  * Extends {@link JmsPoolConnectionFactory} so that {@code instanceof} checks still work.
  */
 public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory {
 
+    private static final Logger LOG = Logger.getLogger(DelegatingJmsPoolConnectionFactory.class);
+
     private volatile JmsPoolConnectionFactory delegate;
     private final ConnectionFactory wrappedConnectionFactory;
+    private final PooledJmsWrapper wrapper;
     private volatile boolean passthrough;
 
     public DelegatingJmsPoolConnectionFactory(ConnectionFactory wrappedConnectionFactory) {
+        this(wrappedConnectionFactory, null);
+    }
+
+    DelegatingJmsPoolConnectionFactory(ConnectionFactory wrappedConnectionFactory, PooledJmsWrapper wrapper) {
         this.wrappedConnectionFactory = wrappedConnectionFactory;
+        this.wrapper = wrapper;
     }
 
     public void setDelegate(JmsPoolConnectionFactory delegate) {
@@ -51,6 +63,37 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
         return wrappedConnectionFactory;
     }
 
+    /**
+     * Ensures this factory is initialized, either via the startup initializer or lazily.
+     * After this call, either {@code delegate} is set or {@code passthrough} is true.
+     */
+    private void ensureInitialized() {
+        if (delegate != null || passthrough) {
+            return;
+        }
+        if (wrapper != null) {
+            synchronized (this) {
+                if (delegate != null || passthrough) {
+                    return;
+                }
+                String configName = PooledJmsRuntimeConfig.DEFAULT_CONNECTION_FACTORY_NAME;
+                if (!wrapper.isPoolingEnabled(configName)) {
+                    LOG.debugf("Lazy init: pooling disabled for %s, using passthrough",
+                            wrappedConnectionFactory.getClass().getSimpleName());
+                    passthrough = true;
+                } else {
+                    JmsPoolConnectionFactory pool = wrapper.createPool(configName, wrappedConnectionFactory);
+                    LOG.debugf("Lazy init: created pool for %s, pool type %s",
+                            wrappedConnectionFactory.getClass().getSimpleName(),
+                            pool.getClass().getSimpleName());
+                    delegate = pool;
+                }
+            }
+            return;
+        }
+        throw new IllegalStateException("Pooled JMS ConnectionFactory has not been initialized yet");
+    }
+
     private JmsPoolConnectionFactory delegate() {
         JmsPoolConnectionFactory d = delegate;
         if (d == null) {
@@ -63,6 +106,7 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     @Override
     public Connection createConnection() throws JMSException {
+        ensureInitialized();
         if (passthrough) {
             return wrappedConnectionFactory.createConnection();
         }
@@ -71,6 +115,7 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     @Override
     public Connection createConnection(String userName, String password) throws JMSException {
+        ensureInitialized();
         if (passthrough) {
             return wrappedConnectionFactory.createConnection(userName, password);
         }
@@ -79,6 +124,7 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     @Override
     public QueueConnection createQueueConnection() throws JMSException {
+        ensureInitialized();
         if (passthrough) {
             return ((jakarta.jms.QueueConnectionFactory) wrappedConnectionFactory).createQueueConnection();
         }
@@ -87,6 +133,7 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     @Override
     public QueueConnection createQueueConnection(String userName, String password) throws JMSException {
+        ensureInitialized();
         if (passthrough) {
             return ((jakarta.jms.QueueConnectionFactory) wrappedConnectionFactory).createQueueConnection(userName,
                     password);
@@ -96,6 +143,7 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     @Override
     public TopicConnection createTopicConnection() throws JMSException {
+        ensureInitialized();
         if (passthrough) {
             return ((jakarta.jms.TopicConnectionFactory) wrappedConnectionFactory).createTopicConnection();
         }
@@ -104,6 +152,7 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     @Override
     public TopicConnection createTopicConnection(String userName, String password) throws JMSException {
+        ensureInitialized();
         if (passthrough) {
             return ((jakarta.jms.TopicConnectionFactory) wrappedConnectionFactory).createTopicConnection(userName,
                     password);
@@ -115,6 +164,7 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     @Override
     public JMSContext createContext() {
+        ensureInitialized();
         if (passthrough) {
             return wrappedConnectionFactory.createContext();
         }
@@ -123,6 +173,7 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     @Override
     public JMSContext createContext(int sessionMode) {
+        ensureInitialized();
         if (passthrough) {
             return wrappedConnectionFactory.createContext(sessionMode);
         }
@@ -131,6 +182,7 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     @Override
     public JMSContext createContext(String userName, String password) {
+        ensureInitialized();
         if (passthrough) {
             return wrappedConnectionFactory.createContext(userName, password);
         }
@@ -139,6 +191,7 @@ public class DelegatingJmsPoolConnectionFactory extends JmsPoolConnectionFactory
 
     @Override
     public JMSContext createContext(String userName, String password, int sessionMode) {
+        ensureInitialized();
         if (passthrough) {
             return wrappedConnectionFactory.createContext(userName, password, sessionMode);
         }

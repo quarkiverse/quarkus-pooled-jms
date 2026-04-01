@@ -37,7 +37,7 @@ public class PooledJmsWrapper {
      * @return the wrapped (delegating) connection factory
      */
     public ConnectionFactory wrapConnectionFactory(ConnectionFactory connectionFactory) {
-        DelegatingJmsPoolConnectionFactory delegating = new DelegatingJmsPoolConnectionFactory(connectionFactory);
+        DelegatingJmsPoolConnectionFactory delegating = new DelegatingJmsPoolConnectionFactory(connectionFactory, this);
         poolConnectionFactories.add(delegating);
         return delegating;
     }
