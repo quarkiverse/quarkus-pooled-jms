@@ -29,8 +29,9 @@ public class XATransactionSupportIndirect {
 
         XAResourceRecoveryRegistry xaResourceRecoveryRegistry = Arc.container().instance(XAResourceRecoveryRegistry.class)
                 .get();
-        boolean recoveryEnable = ConfigProvider.getConfig().getValue("quarkus.transaction-manager.enable-recovery",
-                Boolean.class);
+        boolean recoveryEnable = ConfigProvider.getConfig()
+                .getOptionalValue("quarkus.transaction-manager.enable-recovery", Boolean.class)
+                .orElse(false);
 
         if (xaResourceRecoveryRegistry != null && recoveryEnable) {
             JmsXAResourceRecoveryHelper recoveryHelper = new JmsXAResourceRecoveryHelper(xaConnectionFactory);
