@@ -29,7 +29,7 @@
     <quarkus.version>3.38.0</quarkus.version>
     <quarkus-artemis.version>3.14.3</quarkus-artemis.version>
     <quarkus-qpid-jms.version>2.12.0</quarkus-qpid-jms.version>
-    <pooled-jms.version>3.2.2</pooled-jms.version>
+    <pooled-jms.version>3.2.4</pooled-jms.version>
   </properties>
   <dependencyManagement>
     <dependencies>
