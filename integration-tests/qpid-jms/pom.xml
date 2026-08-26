@@ -8,15 +8,6 @@
   </parent>
   <artifactId>quarkus-pooled-jms-integration-qpid-jms-tests</artifactId>
   <name>Quarkus - Pooled Jms - Integration Tests - Qpid JMS</name>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.apache.qpid</groupId>
-        <artifactId>proton-j</artifactId>
-        <version>${proton-j.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>io.quarkus</groupId>

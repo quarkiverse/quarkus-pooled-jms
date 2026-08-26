@@ -29,7 +29,6 @@
     <quarkus.version>3.39.0</quarkus.version>
     <quarkus-artemis.version>3.14.3</quarkus-artemis.version>
     <quarkus-qpid-jms.version>2.13.0</quarkus-qpid-jms.version>
-    <proton-j.version>0.35.0</proton-j.version>
     <pooled-jms.version>3.2.4</pooled-jms.version>
   </properties>
   <dependencyManagement>
